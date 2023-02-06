@@ -10,7 +10,7 @@ public class ChainSolver : MonoBehaviour
     
     //  Target and pole transforms
     public Transform Target;
-    //public Transform Pole;
+    public Transform Pole;
     
     //  Max solver iterations
     public int MaxIterations = 10;
@@ -25,6 +25,13 @@ public class ChainSolver : MonoBehaviour
     protected Transform[] Bones;
     protected Vector3[] Positions;
     
+    //  Rotation parameters
+    protected Vector3[] StartDirections;
+    protected Quaternion[] StartRotations;
+    protected Quaternion StartRotationTarget;
+    protected Quaternion StartRotationRoot;
+    
+    
     private void Awake()
     {
         Init();
@@ -36,7 +43,17 @@ public class ChainSolver : MonoBehaviour
         Bones = new Transform[ChainLength + 1];
         Positions = new Vector3[ChainLength + 1];
         BoneLengths = new float[ChainLength];
+        StartDirections = new Vector3[ChainLength + 1];
+        StartRotations = new Quaternion[ChainLength + 1];
 
+        if (Target is null)
+        {
+            Debug.LogError("Target game object should not be null!");
+            return;
+        }
+        StartRotationTarget = Target.rotation;
+        
+        
         CompleteLength = 0.0f;
 
         var currentBone = transform;
@@ -45,12 +62,21 @@ public class ChainSolver : MonoBehaviour
         for (var i = ChainLength; i >= 0; i--)
         {
             Bones[i] = currentBone;
-
+            StartRotations[i] = currentBone.rotation;
+            var currentPosition = currentBone.position;
             if (i < ChainLength)
             {
-                var boneLength = (Bones[i + 1].position - currentBone.position).magnitude;
+                //  mid bone
+                
+                StartDirections[i] = Bones[i+1].position - currentPosition;
+                var boneLength = (Bones[i + 1].position - currentPosition).magnitude;
                 BoneLengths[i] = boneLength;
                 CompleteLength += boneLength;
+            }
+            else
+            {
+                //  leaf bone
+                StartDirections[i] = Target.position - currentPosition;
             }
             currentBone = currentBone.parent;
         }
@@ -71,9 +97,13 @@ public class ChainSolver : MonoBehaviour
             Init();
         }
 
+        
+        //Setup positions array by mapping bone positions to array
         Positions = Bones.Select(bone => bone.position).ToArray();
         
         //  Calculate chain positions
+        var rootRotation = (Bones[0].parent != null) ? Bones[0].parent.rotation : Quaternion.identity;
+        var rotationDifference = rootRotation * Quaternion.Inverse(StartRotationRoot);
         
         //  First check if target position is further than total length of chain
         var rootToTarget = Target.position - Positions[0];
@@ -117,9 +147,33 @@ public class ChainSolver : MonoBehaviour
             }
         }
         
+        //  Account for pole
+        if (Pole is not null)
+        {
+            for (int i = 1; i < ChainLength; i++)
+            {
+                var plane = new Plane(Positions[i + 1] - Positions[i - 1], Positions[i - 1]);
+                var projectedPole = plane.ClosestPointOnPlane(Pole.position);
+                var projectedBone = plane.ClosestPointOnPlane(Positions[i]);
+                
+                
+                // Get the angle between the projected bone and the projected pole relative to the plane normal
+                var angle = Vector3.SignedAngle(projectedBone - Positions[i - 1], projectedPole - Positions[i - 1],
+                    plane.normal);
+                
+                //  Use that angle to rotate the bone position about the plane normal such that it is close to the pole.
+                Positions[i] = Quaternion.AngleAxis(angle, plane.normal) * (Positions[i] - Positions[i - 1]) +
+                               Positions[i - 1];
+            }
+        }
+        
         //  Set bone positions to new solved positions
         for (var i = 0; i < Positions.Length; i++)
         {
+            if (i == Positions.Length - 1)
+                Bones[i].rotation = Target.rotation * Quaternion.Inverse(StartRotationTarget) * StartRotations[i];
+            else
+                Bones[i].rotation = Quaternion.FromToRotation(StartDirections[i], Positions[i+1] - Positions[i]) * StartRotations[i];
             Bones[i].position = Positions[i];
         }
 
