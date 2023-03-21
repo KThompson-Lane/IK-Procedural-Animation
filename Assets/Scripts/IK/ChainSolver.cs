@@ -102,9 +102,7 @@ public class ChainSolver : MonoBehaviour
         Positions = Bones.Select(bone => bone.position).ToArray();
         
         //  Calculate chain positions
-        var rootRotation = (Bones[0].parent != null) ? Bones[0].parent.rotation : Quaternion.identity;
-        var rotationDifference = rootRotation * Quaternion.Inverse(StartRotationRoot);
-        
+
         //  First check if target position is further than total length of chain
         var rootToTarget = Target.position - Positions[0];
         if (rootToTarget.sqrMagnitude >= CompleteLength * CompleteLength)
@@ -130,7 +128,7 @@ public class ChainSolver : MonoBehaviour
                         Positions[i] = Target.position;
                     else
                     {
-                        //  Position of parent bone, plus direction from parent to current bone, times by length of current bone
+                        //  Position of child bone, plus direction from child to current bone, times by length of current bone
                         Positions[i] = Positions[i + 1] + (Positions[i] - Positions[i + 1]).normalized * BoneLengths[i];
                     }
                 }
@@ -138,7 +136,7 @@ public class ChainSolver : MonoBehaviour
                 //  Forward IK
                 for (int i = 1; i < Positions.Length; i++)
                 {
-                    //  Position of child bone, plus direction from child to current bone, times by length of child bone
+                    //  Position of parent bone, plus direction from parent to current bone, times by length of parent bone
                     Positions[i] = Positions[i-1] + (Positions[i] - Positions[i - 1]).normalized * BoneLengths[i-1];
                 }
 
@@ -150,7 +148,8 @@ public class ChainSolver : MonoBehaviour
         //  Account for pole
         if (Pole is not null)
         {
-            for (int i = 1; i < ChainLength; i++)
+            // We are only interested in the bones between the first and last one
+            for (int i = 1; i < Positions.Length - 1; i++) 
             {
                 var plane = new Plane(Positions[i + 1] - Positions[i - 1], Positions[i - 1]);
                 var projectedPole = plane.ClosestPointOnPlane(Pole.position);
