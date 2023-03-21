@@ -18,7 +18,7 @@ public class Stepper : MonoBehaviour
     
     public bool Moving;
 
-    private void Update()
+    public void TryStep()
     {
         //  Do nothing if we're already taking a step
         if (Moving) return;

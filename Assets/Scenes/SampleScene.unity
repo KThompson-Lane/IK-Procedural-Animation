@@ -390,9 +390,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 666716594}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &321813722
 GameObject:
@@ -574,9 +574,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1661221492}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &382926439
 GameObject:
@@ -724,9 +724,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1783009436}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &446347204
 GameObject:
@@ -908,9 +908,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 382926440}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &471171399
 GameObject:
@@ -1009,9 +1009,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1534055547}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &573944155
 GameObject:
@@ -1110,9 +1110,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 258000230}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &595712065
 GameObject:
@@ -1920,37 +1920,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 989196885}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1088067798
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1088067799}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1088067799
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1088067798}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.28, y: 1.72, z: 1.0419168}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1143327403
 GameObject:
   m_ObjectHideFlags: 0
@@ -2087,9 +2056,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 689115513}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &1268486574
 GameObject:
@@ -2187,7 +2156,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1304898699 stripped
 GameObject:
@@ -2898,9 +2867,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1413978477}
-  stepDistance: 3
+  stepDistance: 2.5
   stepDuration: 0.5
-  stepOvershoot: 0.2
+  stepOvershoot: 0.15
   Moving: 0
 --- !u!1 &2061082607 stripped
 GameObject:
@@ -2950,6 +2919,15 @@ MonoBehaviour:
   headBone: {fileID: 157583486}
   Speed: 1
   LookConstraint: 45
+  LegSteppers:
+  - {fileID: 1992783225}
+  - {fileID: 447769531}
+  - {fileID: 471171403}
+  - {fileID: 435555176}
+  - {fileID: 382132114}
+  - {fileID: 317884988}
+  - {fileID: 1243213798}
+  - {fileID: 573944159}
 --- !u!1 &2130634436 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8894956856030049090, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}

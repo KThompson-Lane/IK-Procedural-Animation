@@ -15,12 +15,10 @@ public class StepTarget : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Vector3 dwn = transform.TransformDirection(Vector3.down);
-
         RaycastHit hit;
-        if (Physics.Raycast(transform.position + Vector3.up * heightOffset, dwn, out hit, 10, mask))
+        if (Physics.Raycast(transform.position + Vector3.up * heightOffset, Vector3.down, out hit, 10, mask))
         {
-            Debug.DrawRay(transform.position, dwn * hit.distance, Color.yellow);
+            Debug.DrawRay(transform.position, Vector3.down * (hit.distance - heightOffset), Color.yellow);
             print("Hit Ground!");
             transform.position = hit.point;
         }
