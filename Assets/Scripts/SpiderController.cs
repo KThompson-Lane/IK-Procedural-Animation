@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class SpiderController : MonoBehaviour
@@ -8,10 +8,12 @@ public class SpiderController : MonoBehaviour
     [SerializeField] Transform target;
     // Head bone transform
     [SerializeField] Transform headBone;
-
+    [SerializeField] Transform root;
     [SerializeField] float Speed = 1.0f;
     [SerializeField] float LookConstraint = 45.0f;
 
+    [SerializeField] private float BodyHeightOffset = 2.75f;
+    
     //  Array is indexed back-left to front-right, i.e. index 0 is rear left and index 8 is front right 
     [SerializeField] private Stepper[] LegSteppers = new Stepper[8];
     // We do all animation code in LateUpdate
@@ -48,6 +50,19 @@ public class SpiderController : MonoBehaviour
             targetLocalRotation,
             1 - Mathf.Exp((-Speed * Time.deltaTime))
         );
+        
+        //  Determine body position relative to legs.
+        var startPosition = root.position;
+        var averagePosition = LegSteppers.Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / LegSteppers.Length;
+        
+        var endPosition = averagePosition + new Vector3(0,BodyHeightOffset);
+        var centre = (startPosition + endPosition) / 2;
+        root.position =
+            Vector3.Lerp(
+                Vector3.Lerp(startPosition, centre,  Time.deltaTime),
+                Vector3.Lerp(centre, averagePosition + new Vector3(0,BodyHeightOffset),  Time.deltaTime),
+                Time.deltaTime
+            );
     }
     IEnumerator MoveLegs()
     {
