@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -95,5 +96,14 @@ public class Stepper : MonoBehaviour
 
         // Finished taking a step
         _moving = false;
+    }
+
+    //  Debug function for drawing each legs current position and home-position
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.2f);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(home.position, _stepDistance);
     }
 }
