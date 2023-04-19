@@ -11,11 +11,16 @@ namespace DefaultNamespace
         private Vector3 _currentVelocity = Vector3.zero;
         private float _targetAngle;
         private Vector3 _projectedDirectionToTarget;
+        
+        private float fx,zx,rx;
+        private float fy,zy,ry;
+        private SecondOrderMotion Movement, Orientation;
+
         public RootMotion(Transform root, Transform target, float moveSpeed, float turnSpeed, float maxAngleToTarget, float moveAcceleration = 1.0f,float turnAcceleration = 1.0f, float approachDistance = 1.0f, float retreatDistance = 1.0f)
         {
             _root = root;
             _target = target;
-            _moveSpeed = moveSpeed;
+            _moveSpeed = moveSpeed * 0.01f;
             _turnSpeed = turnSpeed;
             _moveAcceleration = moveAcceleration;
             _turnAcceleration = turnAcceleration;
@@ -28,7 +33,7 @@ namespace DefaultNamespace
             float moveAcceleration = 1.0f, float turnAcceleration = 1.0f, float approachDistance = 1.0f,
             float retreatDistance = 1.0f)
         {
-            _moveSpeed = moveSpeed;
+            _moveSpeed = moveSpeed * 0.01f;
             _turnSpeed = turnSpeed;
             _moveAcceleration = moveAcceleration;
             _turnAcceleration = turnAcceleration;
@@ -36,14 +41,26 @@ namespace DefaultNamespace
             _approachDistance = approachDistance;
             _retreatDistance = retreatDistance;
         }
+        
+        public void SetMovementCoefficients(float f, float z, float r)
+        {
+            fx = f;
+            zx = z;
+            rx = r;
+            Movement = new SecondOrderMotion(fx, zx, rx, Vector3.zero);
+        }
+
 
         public void UpdateRootMotion()
         {
-            UpdateRotation();
+            if(Movement == null)
+                return;
+
+            UpdateOrientation();
             UpdateTranslation();
         }
 
-        private void UpdateRotation()
+        private void UpdateOrientation()
         {
             //  Get the direction toward our target
             var toTarget = _target.position - _root.position;
@@ -104,15 +121,10 @@ namespace DefaultNamespace
                     targetVelocity = _moveSpeed * -_projectedDirectionToTarget.normalized;
                 }
             }
-
-            _currentVelocity = Vector3.Lerp(
-                _currentVelocity,
-                targetVelocity,
-                1 - Mathf.Exp(-_moveAcceleration * Time.deltaTime)
-            );
-
+            
+            _currentVelocity = Movement.Update(_moveAcceleration * Time.deltaTime, targetVelocity);
             // Apply the velocity
-            _root.position += _currentVelocity * Time.deltaTime;
+            _root.position += _currentVelocity;
         }
     }
 }

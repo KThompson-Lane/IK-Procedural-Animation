@@ -14,7 +14,7 @@ public class StepTarget : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Physics.Raycast(transform.position + (Vector3.up * 5), Vector3.down, out var hit, 10, mask))
+        if (Physics.Raycast(transform.position + (Vector3.up * 5), Vector3.down, out var hit, 100, mask))
         {
             transform.position = hit.point;
         }

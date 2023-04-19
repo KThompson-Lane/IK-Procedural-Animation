@@ -24,6 +24,14 @@ public class SpiderController : MonoBehaviour
     [SerializeField] float approachDistance = 1.0f, retreatDistance = 1.0f;
     [SerializeField] [Range(0f, 90f)] float maxTurnAngle = 45.0f;
     
+    [Header("Movement coefficients")]
+    [SerializeField] 
+    private float fx,zx,rx;
+    
+    [Header("Orientation coefficients")]
+    [SerializeField]
+    private float fy,zy,ry;
+    
     [Header("Leg Steppers")]
     //  Leg stepper parameters
     [SerializeField] private float bodyHeightOffset = 2.75f;
@@ -54,6 +62,8 @@ public class SpiderController : MonoBehaviour
     {
         _headTracker = new(headBone, target, lookConstraint, lookSpeed);
         _rootMotion = new(transform, target, moveSpeed, turnSpeed, maxTurnAngle, moveAcceleration, turnAcceleration, approachDistance, retreatDistance);
+        _rootMotion.SetMovementCoefficients(fx,zx, rx);
+
         foreach (var group in legGroups)
         {
             //  Calculate leg parameters

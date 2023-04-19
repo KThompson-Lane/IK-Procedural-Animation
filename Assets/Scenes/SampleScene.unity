@@ -267,9 +267,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 531119179}
-  fx: 1.4
-  zx: 0.5
-  rx: -1.5
+  fx: 0.25
+  zx: 0.65
+  rx: -1.1
   fy: 0.85
   zy: 0.75
   ry: -1
@@ -348,14 +348,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 106081163}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.66, y: 4.28, z: 29.03}
+  m_LocalRotation: {x: -0, y: -0, z: -0.0009251253, w: 0.9999996}
+  m_LocalPosition: {x: -2.95, y: 4.28, z: 16.83}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8885598}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.106}
 --- !u!4 &157583486 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6482158797432592996, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -3221,11 +3221,17 @@ MonoBehaviour:
   lookConstraint: 45
   turnSpeed: 15
   turnAcceleration: 3
-  moveSpeed: 2.5
-  moveAcceleration: 1.25
+  moveSpeed: 2.3
+  moveAcceleration: 1.12
   approachDistance: 7.5
   retreatDistance: 5
   maxTurnAngle: 15
+  fx: 0.8
+  zx: 0.85
+  rx: -1.1
+  fy: 0.85
+  zy: 0.75
+  ry: -1
   bodyHeightOffset: 2.75
   rootBone: {fileID: 1436336141}
   bodyAngleSmoothing: 0.54
@@ -3234,19 +3240,19 @@ MonoBehaviour:
     - {fileID: 1992783225}
     - {fileID: 435555176}
     - {fileID: 382132114}
-    stepDistance: 0.85
-    overshootAmount: 0.7
+    stepDistance: 1.1
+    overshootAmount: 0.8
   - legs:
     - {fileID: 447769531}
     - {fileID: 471171403}
     - {fileID: 317884988}
-    stepDistance: 0.85
-    overshootAmount: 0.7
+    stepDistance: 1.1
+    overshootAmount: 0.8
   - legs:
     - {fileID: 1243213798}
     - {fileID: 573944159}
-    stepDistance: 0.9
-    overshootAmount: 0.75
+    stepDistance: 1.2
+    overshootAmount: 0.9
   corners:
   - {fileID: 689115513}
   - {fileID: 382926440}
