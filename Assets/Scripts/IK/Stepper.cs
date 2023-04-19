@@ -10,23 +10,31 @@ public class Stepper : MonoBehaviour
     //  The home transform for this leg
     [SerializeField] private Transform home;
     //  If we surpass this distance, step towards home
-    [SerializeField] float stepDistance;
+    [SerializeField] float _stepDistance;
     //  Time it takes to complete a step 
-    [SerializeField] float stepDuration;
+    [SerializeField] float _stepDuration;
     //  Amount to overshoot the home position by
-    [SerializeField] float stepOvershoot;
+    [SerializeField] float _stepOvershoot;
     
-    public bool Moving;
+    private bool _moving;
+    public bool Grounded => !_moving;
 
     public void TryStep()
     {
         //  Do nothing if we're already taking a step
-        if (Moving) return;
+        if (_moving) return;
 
-        if (Vector3.Distance(transform.position, home.position) > stepDistance)
+        if (Vector3.Distance(transform.position, home.position) > _stepDistance)
             StartCoroutine(TakeStep());
     }
 
+    public void ChangeLegParameters(float stepDistance, float stepDuration, float stepOvershoot)
+    {
+        _stepDistance = stepDistance;
+        _stepDuration = stepDuration;
+        _stepOvershoot = stepOvershoot;
+    }
+    
     /// <summary>
     /// Coroutine for taking a step towards home taking stepDuration seconds
     /// </summary>
@@ -34,7 +42,7 @@ public class Stepper : MonoBehaviour
     IEnumerator TakeStep()
     {
         //  Indicate this leg is taking a step
-        Moving = true;
+        _moving = true;
 
         //  Keep track of our initial transform
         var startRotation = transform.rotation;
@@ -46,7 +54,7 @@ public class Stepper : MonoBehaviour
         //  Directional vector to the home position
         Vector3 stepDirection = (endPosition - startPosition);
         //  Distance to overshoot by
-        float overshootDistance = stepDistance * stepOvershoot;
+        float overshootDistance = _stepDistance * _stepOvershoot;
         Vector3 movementVector = stepDirection * overshootDistance;
         //  Project it onto the ground plane
         movementVector = Vector3.ProjectOnPlane(movementVector, Vector3.up);
@@ -68,7 +76,7 @@ public class Stepper : MonoBehaviour
             timeElapsed += Time.deltaTime;
 
             //  Normalise elapsed time in terms of total step duration
-            float normalizedTime = timeElapsed / stepDuration;
+            float normalizedTime = timeElapsed / _stepDuration;
 
             // Interpolate transform quadratically using nested Lerps
             transform.position =
@@ -83,9 +91,9 @@ public class Stepper : MonoBehaviour
             // Wait for one frame
             yield return null;
         }
-        while (timeElapsed < stepDuration);
+        while (timeElapsed < _stepDuration);
 
         // Finished taking a step
-        Moving = false;
+        _moving = false;
     }
 }

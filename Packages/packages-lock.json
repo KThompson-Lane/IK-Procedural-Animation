@@ -17,13 +17,13 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.18",
+      "version": "https://github.com/van800/com.unity.ide.rider.git?path=/Packages/com.unity.ide.rider#3.0.21",
       "depth": 0,
-      "source": "registry",
+      "source": "git",
       "dependencies": {
         "com.unity.ext.nunit": "1.0.6"
       },
-      "url": "https://packages.unity.com"
+      "hash": "8ddb86f5be3fce47dc165a2f6bb365577d79a8e4"
     },
     "com.unity.ide.vscode": {
       "version": "1.2.5",

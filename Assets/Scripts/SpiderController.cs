@@ -1,98 +1,133 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using UnityEngine;
 
 public class SpiderController : MonoBehaviour
 {
-    // Target transform
+    [Header("Target")]
     [SerializeField] Transform target;
-    // Head bone transform
-    [SerializeField] Transform headBone;
-    [SerializeField] Transform root;
-    [SerializeField] float Speed = 1.0f;
-    [SerializeField] float LookConstraint = 45.0f;
-
-    [SerializeField] private float BodyHeightOffset = 2.75f;
     
-    //  Array is indexed back-left to front-right, i.e. index 0 is rear left and index 8 is front right 
-    [SerializeField] private Stepper[] LegSteppers = new Stepper[8];
+    [Header("Head tracking")]
+    [SerializeField] Transform headBone;
+    [SerializeField] float lookSpeed = 1.0f;
+    [SerializeField] [Range(0f, 90f)] float lookConstraint = 45.0f;
+    
+    //  TODO: 
+    //  Add parameter for following distance
+    //  Add parameters to tune second-order motion
+    [Header("Root motion")]
+    [SerializeField] float turnSpeed = 1.0f, turnAcceleration = 1.0f;
+    [SerializeField] float moveSpeed = 1.0f, moveAcceleration = 1.0f;
+    [SerializeField] float approachDistance = 1.0f, retreatDistance = 1.0f;
+    [SerializeField] [Range(0f, 90f)] float maxTurnAngle = 45.0f;
+    
+    [Header("Leg Steppers")]
+    //  Leg stepper parameters
+    [SerializeField] private float bodyHeightOffset = 2.75f;
+    [SerializeField] Transform rootBone;
+    [SerializeField] [Range(0f, 7f)] float bodyAngleSmoothing = 1f;
+    //  Leg groups are groups of individual legs which move together
+    [Serializable]
+    public struct LegGroup
+    {
+        public Stepper[] legs;
+        public float stepDistance;
+        public float overshootAmount;
+    }
+    
+    //  Array of leg pairs
+
+    [SerializeField] private LegGroup[] legGroups;
+    
+    private LookMotion _headTracker;
+    private RootMotion _rootMotion;
+
+    private Vector3 _lastBodyUp;
+    [SerializeField] private Transform[] corners;
+    
     // We do all animation code in LateUpdate
     // This ensures it has the latest object data prior to frame drawing
     private void Awake()
     {
+        _headTracker = new(headBone, target, lookConstraint, lookSpeed);
+        _rootMotion = new(transform, target, moveSpeed, turnSpeed, maxTurnAngle, moveAcceleration, turnAcceleration, approachDistance, retreatDistance);
+        foreach (var group in legGroups)
+        {
+            //  Calculate leg parameters
+            //  Step duration is a function of move speed and step distance
+            var stepDuration =  group.stepDistance / moveSpeed;
+            group.legs.ToList().ForEach(leg => leg.ChangeLegParameters(group.stepDistance, stepDuration, group.overshootAmount));
+        }
         StartCoroutine(MoveLegs());
+        _lastBodyUp = rootBone.up;
+    }
+
+    private void OnValidate()
+    {
+        //  Update the motion parameters used by the head and root motion scripts
+        if (_rootMotion == null || _headTracker == null)
+            return;
+        _rootMotion.ChangeMotionParameters(moveSpeed, turnSpeed, maxTurnAngle, moveAcceleration, turnAcceleration, approachDistance, retreatDistance);
+        _headTracker.ChangeMotionParameters(lookConstraint, lookSpeed);
     }
 
     void LateUpdate()
     {
-        //  Current rotation is stored as we are resetting it below
-        var currentLocalRotation = headBone.localRotation;
-        //  Reset rotation to zero to correctly transform target vector into local space
-        headBone.localRotation = Quaternion.identity;
+        _rootMotion.UpdateRootMotion();
+        _headTracker.UpdateHeadMotion();
         
-        var vectorToTarget = target.position - headBone.position;
-        var localVectorToTarget = headBone.parent.InverseTransformDirection(vectorToTarget);
-        
-        
-        // Constrain rotation vector
-        localVectorToTarget = Vector3.RotateTowards(
-            Vector3.forward,
-            localVectorToTarget,
-            Mathf.Deg2Rad * LookConstraint, // Convert degrees to radians
-            0 // Directional vector magnitude is irrelevant
-        );
-        
-        //  Creates rotation quaternion in local space
-        var targetLocalRotation = Quaternion.LookRotation(localVectorToTarget, Vector3.up);
-
-        //  Set the bone local rotation to the smoothed quaternion
-        headBone.localRotation = Quaternion.Slerp(currentLocalRotation,
-            targetLocalRotation,
-            1 - Mathf.Exp((-Speed * Time.deltaTime))
-        );
-        
+        //  TODO: Move this!
         //  Determine body position relative to legs.
-        var startPosition = root.position;
-        var averagePosition = LegSteppers.Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / LegSteppers.Length;
+        var startPosition = rootBone.position;
+        var averagePosition = legGroups.SelectMany(group => group.legs).Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legGroups.SelectMany(group => group.legs).Count();
         
-        var endPosition = averagePosition + new Vector3(0,BodyHeightOffset);
+        var endPosition = averagePosition + new Vector3(0,bodyHeightOffset);
         var centre = (startPosition + endPosition) / 2;
-        root.position =
+        rootBone.position =
             Vector3.Lerp(
                 Vector3.Lerp(startPosition, centre,  Time.deltaTime),
-                Vector3.Lerp(centre, averagePosition + new Vector3(0,BodyHeightOffset),  Time.deltaTime),
+                Vector3.Lerp(centre, averagePosition + new Vector3(0,bodyHeightOffset),  Time.deltaTime),
                 Time.deltaTime
             );
+        
+        
+        //  Orient body based on corner leg positions
+        Vector3 v1 = corners[0].position - corners[1].position;
+        Vector3 v2 = corners[2].position - corners[3].position;
+        //  Calculate the cross product based on the vectors between the diagonally opposed legs
+        var normal = Vector3.Cross(v1, v2).normalized;
+        
+        //  Interpolate the vector to smooth it
+        Vector3 newUp = Vector3.Lerp(_lastBodyUp, normal, 1f / (bodyAngleSmoothing + 1));
+        rootBone.localRotation = Quaternion.FromToRotation(Vector3.up, newUp);
+        _lastBodyUp = newUp;
     }
-    IEnumerator MoveLegs()
+    private IEnumerator MoveLegs()
     {
         while (true)
         {
-            // Try moving one diagonal pair of legs
-            do
+            // Try moving each group of legs
+            foreach (var group in legGroups)
             {
-                LegSteppers[0].TryStep();
-                LegSteppers[3].TryStep();
-                LegSteppers[4].TryStep();
-                LegSteppers[7].TryStep();
-                // Wait a frame
-                yield return null;
-      
-                // Stay in this loop while either leg is moving.
-                // If only one leg in the pair is moving, the calls to TryMove() will let
-                // the other leg move if it wants to.
-            } while (LegSteppers[0].Moving || LegSteppers[3].Moving || LegSteppers[4].Moving || LegSteppers[7].Moving);
+                do
+                {
+                    foreach (var leg in group.legs)
+                    {
+                        leg.TryStep();
+                    }
 
-            // Do the same thing for the other diagonal pair
-            do
-            {
-                LegSteppers[1].TryStep();
-                LegSteppers[2].TryStep();
-                LegSteppers[5].TryStep();
-                LegSteppers[6].TryStep();
-                yield return null;
-            } while (LegSteppers[1].Moving || LegSteppers[2].Moving || LegSteppers[5].Moving || LegSteppers[6].Moving);
-
+                    yield return null;
+                    
+                } while (group.legs.Any(leg => !leg.Grounded));
+            }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Debug.DrawRay(rootBone.position, rootBone.up * 20, Color.green);
     }
 }
