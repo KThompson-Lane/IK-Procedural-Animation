@@ -79,7 +79,6 @@ public class SpiderController : MonoBehaviour
         _rootMotion.UpdateRootMotion();
         _headTracker.UpdateHeadMotion();
         
-        //  TODO: Move this!
         //  Determine body position relative to legs.
         var startPosition = rootBone.position;
         var averagePosition = legGroups.SelectMany(group => group.legs).Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legGroups.SelectMany(group => group.legs).Count();
@@ -112,13 +111,13 @@ public class SpiderController : MonoBehaviour
             // Try moving each group of legs
             foreach (var group in legGroups)
             {
+              
+                foreach (var leg in group.legs)
+                {
+                    leg.TryStep();
+                }
                 do
                 {
-                    foreach (var leg in group.legs)
-                    {
-                        leg.TryStep();
-                    }
-
                     yield return null;
                     
                 } while (group.legs.Any(leg => !leg.Grounded));

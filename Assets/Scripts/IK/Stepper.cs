@@ -20,6 +20,8 @@ public class Stepper : MonoBehaviour
     private bool _moving;
     public bool Grounded => !_moving;
 
+    public float DistanceToHome => Vector3.Distance(transform.position, home.position);
+
     public void TryStep()
     {
         //  Do nothing if we're already taking a step
@@ -78,7 +80,6 @@ public class Stepper : MonoBehaviour
 
             //  Normalise elapsed time in terms of total step duration
             float normalizedTime = timeElapsed / _stepDuration;
-
             // Interpolate transform quadratically using nested Lerps
             transform.position =
                 Vector3.Lerp(
