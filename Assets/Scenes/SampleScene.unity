@@ -3240,19 +3240,19 @@ MonoBehaviour:
     - {fileID: 1992783225}
     - {fileID: 435555176}
     - {fileID: 382132114}
-    stepDistance: 1.1
-    overshootAmount: 0.8
+    stepDistance: 0.7
+    overshootAmount: 0.5
   - legs:
     - {fileID: 447769531}
     - {fileID: 471171403}
     - {fileID: 317884988}
-    stepDistance: 1.1
-    overshootAmount: 0.8
+    stepDistance: 0.7
+    overshootAmount: 0.5
   - legs:
     - {fileID: 1243213798}
     - {fileID: 573944159}
-    stepDistance: 1.2
-    overshootAmount: 0.9
+    stepDistance: 0.8
+    overshootAmount: 0.55
   corners:
   - {fileID: 689115513}
   - {fileID: 382926440}
