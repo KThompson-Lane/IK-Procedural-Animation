@@ -73,6 +73,12 @@ namespace DefaultNamespace
             _retreatDistance = retreatDistance;
         }
         
+        /// <summary>
+        ///     <para>Update the second order motion parameters</para>
+        /// </summary>
+        /// <param name="f">frequency of the system</param>
+        /// <param name="z">damping coefficient of the system</param>
+        /// <param name="r">initial response of the system</param>
         public void SetMovementCoefficients(float f, float z, float r)
         {
             fx = f;

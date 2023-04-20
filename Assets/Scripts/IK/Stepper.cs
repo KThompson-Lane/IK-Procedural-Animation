@@ -19,9 +19,14 @@ public class Stepper : MonoBehaviour
     private bool _moving;
     
     //  Is it grounded
+    /// <summary>
+    /// Boolean which represents if the leg is grounded
+    /// </summary>
     public bool Grounded => !_moving;
 
-    //  Current distance to home position
+    /// <summary>
+    /// Current distance to home position
+    /// </summary>
     public float DistanceToHome => Vector3.Distance(transform.position, home.position);
 
     /// <summary>

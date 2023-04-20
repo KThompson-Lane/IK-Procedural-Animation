@@ -49,8 +49,12 @@ public class SpiderController : MonoBehaviour
     [Serializable]
     public struct LegGroup
     {
+        /// <value>The legs which the group contains</value>
         public Stepper[] legs;
+        /// <value>The group default step distance</value>
         public float stepDistance;
+        /// <value>The group default step overshoot amount</value>
+        [Range(0.0f,1.0f)]
         public float overshootAmount;
     }
     
