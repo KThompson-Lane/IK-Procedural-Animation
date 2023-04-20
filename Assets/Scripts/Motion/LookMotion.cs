@@ -4,7 +4,6 @@ namespace Motion
 {
     /// <summary>
     ///     <para>Applies smoothing and interpolation to produce a pleasing look motion</para>
-    ///     .
     /// </summary>
     public class LookMotion
     {

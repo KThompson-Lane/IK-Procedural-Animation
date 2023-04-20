@@ -4,7 +4,6 @@ namespace Second_Order_Systems
 {
     /// <summary>
     ///     <para>Uses second order time derivatives to create dampening behaviours</para>
-    ///     .
     /// </summary>
     public class SecondOrderMotion
     {
