@@ -11,6 +11,8 @@ namespace IK
         //  The home transform
         [SerializeField] private Transform home;
 
+        //  Is this stepper weakened
+        [SerializeField] private bool weakened;
         //  Whether it is currently taking a step
         private bool _moving;
 
@@ -53,7 +55,7 @@ namespace IK
             //  Do nothing if we're already taking a step
             if (_moving) return;
 
-            if (Vector3.Distance(transform.position, home.position) > _stepDistance)
+            if (Vector3.Distance(transform.position, home.position) > (!weakened? _stepDistance : _stepDistance/2))
                 StartCoroutine(TakeStep());
         }
 

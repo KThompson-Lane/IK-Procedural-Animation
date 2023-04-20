@@ -506,6 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 666716594}
+  weakened: 0
 --- !u!1 &321813722
 GameObject:
   m_ObjectHideFlags: 0
@@ -686,6 +687,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1661221492}
+  weakened: 0
 --- !u!1 &382926439
 GameObject:
   m_ObjectHideFlags: 0
@@ -831,6 +833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1783009436}
+  weakened: 0
 --- !u!1 &446347204
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1014,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 382926440}
+  weakened: 0
 --- !u!1 &471171399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1108,6 +1112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1534055547}
+  weakened: 0
 --- !u!1 &531119178
 GameObject:
   m_ObjectHideFlags: 0
@@ -1302,6 +1307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 258000230}
+  weakened: 0
 --- !u!1 &595712065
 GameObject:
   m_ObjectHideFlags: 0
@@ -2344,6 +2350,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 689115513}
+  weakened: 0
 --- !u!1 &1268486574
 GameObject:
   m_ObjectHideFlags: 0
@@ -3232,6 +3239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1413978477}
+  weakened: 0
 --- !u!1 &2061082607 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1550337731417334179, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
