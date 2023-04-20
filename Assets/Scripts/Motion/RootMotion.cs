@@ -45,9 +45,6 @@ namespace Motion
         
         private float _currentAngularVelocity;
         private Vector3 _currentVelocity = Vector3.zero;
-        private float _targetAngle;
-        private Vector3 _toTargetProjected;
-        
         private SecondOrderMotion _movement;
 
         private void Start()
@@ -60,73 +57,49 @@ namespace Motion
         /// </summary>
         public void UpdateRootMotion()
         {
-            if (_movement == null)
-                return;
-
-            UpdateOrientation();
-            UpdateTranslation();
-        }
-
-        /// <summary>
-        ///     <para>Updates the root transform orientation to face the target</para>
-        /// </summary>
-        private void UpdateOrientation()
-        {
+            //  Reset velocities 
+            var targetAngularVelocity = 0f;
+            var targetVelocity = Vector3.zero;
+            
             //  Get the direction toward our target
             var toTarget = target.position - root.position;
 
             //  Project our direction vector on the local XZ plane
-            _toTargetProjected = Vector3.ProjectOnPlane(toTarget, root.up);
+            var toTargetProjected = Vector3.ProjectOnPlane(toTarget, root.up);
 
             //  Calculate the angle from our forward direction to our projected target direction
-            _targetAngle = Vector3.SignedAngle(root.forward, _toTargetProjected, root.up);
-
-            //  Reset our target angular velocity
-            var targetAngularVelocity = 0f;
-
+            var targetAngle = Vector3.SignedAngle(root.forward, toTargetProjected, root.up);
 
             // Check if we need to rotate to face our target
-            if (Mathf.Abs(_targetAngle) > maxAngleToTarget)
+            if (Mathf.Abs(targetAngle) > maxAngleToTarget)
                 //  Convert our angle to positive or negative turn speed (Positive angle is clockwise movement)
-                targetAngularVelocity = _targetAngle > 0 ? turnSpeed : -turnSpeed;
+                targetAngularVelocity = targetAngle > 0 ? turnSpeed : -turnSpeed;
 
-            // Linearly interpolate between our current angular velocity and our target velocity
+            
+            //  TODO: Replace this with another second order motion system
+            //  Linearly interpolate between our current angular velocity and our target velocity
             _currentAngularVelocity = Mathf.Lerp(
                 _currentAngularVelocity,
                 targetAngularVelocity,
                 1 - Mathf.Exp(-turnAcceleration * Time.deltaTime)
             );
 
-            // Rotate around the world Y axis to face our target
+            //  Rotate around the global Y axis to face our target
             root.Rotate(0, Time.deltaTime * _currentAngularVelocity, 0, Space.World);
-        }
-
-        /// <summary>
-        ///     <para>Updates the root transform position to move towards the target</para>
-        /// </summary>
-        private void UpdateTranslation()
-        {
-            //  Reset our target velocity
-            var targetVelocity = Vector3.zero;
-
-            //  Get the direction toward our target
-            var toTarget = target.position - root.position;
-            //  Project our direction vector on the local XZ plane
-            var toTargetProjected = Vector3.ProjectOnPlane(toTarget, root.up);
-
-            // Ensure we're facing the target prior to moving
-            if (Mathf.Abs(_targetAngle) < 45)
+            
+            //  Ensure we're facing the target before moving
+            if (Mathf.Abs(targetAngle) < 45)
             {
                 var targetDistance = Vector3.Distance(root.position, Vector3.ProjectOnPlane(target.position, root.up));
 
-                // Use our approach and retreat distances to set our target velocity
+                //  Use our approach and retreat distances to set our target velocity
                 targetVelocity = moveSpeed * (targetDistance > approachDistance ? toTargetProjected :
                     targetDistance <= retreatDistance ? -toTargetProjected : Vector3.zero).normalized;
             }
             
             //  Update our velocity using our second order system
             _currentVelocity = _movement.Update(Time.deltaTime, targetVelocity);
-            // Apply the velocity
+            //  Apply the velocity
             root.position += _currentVelocity;
         }
     }
