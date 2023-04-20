@@ -3068,19 +3068,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 106081166}
-  headBone: {fileID: 157583486}
-  lookSpeed: 1
-  lookConstraint: 45
-  turnSpeed: 15
-  turnAcceleration: 3
-  moveSpeed: 2.3
-  moveAcceleration: 1.12
-  approachDistance: 7.5
-  retreatDistance: 5
-  maxTurnAngle: 15
-  fx: 0.8
-  zx: 0.85
-  rx: -1.1
   bodyHeightOffset: 2.75
   rootBone: {fileID: 1436336141}
   bodyAngleSmoothing: 0.54
@@ -3107,6 +3094,46 @@ MonoBehaviour:
   - {fileID: 382926440}
   - {fileID: 258000230}
   - {fileID: 1413978477}
+--- !u!114 &1882284659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882284656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45facf40c1c44669bb22ab3da1de84c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 2107783712}
+  target: {fileID: 106081166}
+  maxAngleToTarget: 15
+  approachDistance: 9.91
+  retreatDistance: 4.56
+  moveSpeed: 0.024
+  turnSpeed: 45
+  moveAcceleration: 0.507
+  turnAcceleration: 4
+  f: 2.08
+  z: 1.51
+  r: -0.42
+--- !u!114 &1882284660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882284656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf786fee53c47d48b876cf4b5ad99b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookJoint: {fileID: 157583486}
+  target: {fileID: 106081166}
+  lookSpeed: 5
+  lookConstraint: 45
 --- !u!1 &1992783221
 GameObject:
   m_ObjectHideFlags: 0

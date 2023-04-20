@@ -1,94 +1,58 @@
 ﻿using Second_Order_Systems;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Motion
 {
     /// <summary>
     ///     <para>Applies root motion to an object to move it towards a target</para>
     /// </summary>
-    public class RootMotion
+    public class RootMotion : MonoBehaviour
     {
-        //  transforms for the root and target
-        private readonly Transform _root, _target;
-
+        /// <value>joint to transform</value>
+        [SerializeField] private Transform root;
+        /// <value>target to track</value>
+        [SerializeField] private Transform target;
+        
+        /// <value>maximum allowed angle to the target in degrees before rotating to realign</value>
+        [Header("Motion parameters")]
+        [SerializeField] private float maxAngleToTarget;
+        /// <value>minimum distance before moving to approach the target</value>
+        [SerializeField] private float approachDistance;
+        /// <value>minimum distance before retreating from target</value>
+        [SerializeField] private float retreatDistance;
+        /// <value>max movement speed</value>
+        [SerializeField] private float moveSpeed;
+        /// <value>max turn speed</value>
+        [SerializeField] private float turnSpeed;
+        /// <value>turn acceleration</value>
+        [SerializeField] private float turnAcceleration;
+        
+        /// <value>frequency of the system</value>
+        [Header("Movement parameters")]
+        [SerializeField] private float acceleration;
+        /// <value>damping coefficient of the system</value>
+        [SerializeField] private float dampening;
+        /// <value>initial response of the system</value>
+        [SerializeField] private float response;
+        
+        /// <summary>
+        /// Gets the root motion move speed value
+        /// </summary>
+        /// <returns>max movement speed</returns>
+        public float MoveSpeed() => moveSpeed;
+        
+        
         private float _currentAngularVelocity;
         private Vector3 _currentVelocity = Vector3.zero;
-
-        //  parameters for constraining movement
-        private float _maxAngleToTarget, _approachDistance, _retreatDistance;
-
-        //  parameters for movement and turning 
-        private float _moveSpeed, _turnSpeed, _moveAcceleration, _turnAcceleration;
-
         private float _targetAngle;
         private Vector3 _toTargetProjected;
+        
+        private SecondOrderMotion _movement;
 
-        private float fx, zx, rx;
-        private float fy, zy, ry;
-        private SecondOrderMotion Movement, Orientation;
-
-        /// <summary>
-        ///     <para>Constructs a new root motion</para>
-        /// </summary>
-        /// <param name="root">root transform to move</param>
-        /// <param name="target">target transform</param>
-        /// <param name="moveSpeed">max movement speed</param>
-        /// <param name="turnSpeed">max turn speed</param>
-        /// <param name="maxAngleToTarget">maximum allowed angle to the target in degrees before rotating to realign</param>
-        /// <param name="moveAcceleration">movement acceleration</param>
-        /// <param name="turnAcceleration">turn acceleration</param>
-        /// <param name="approachDistance">minimum distance before moving to approach the target</param>
-        /// <param name="retreatDistance">minimum distance before retreating from target</param>
-        public RootMotion(Transform root, Transform target, float moveSpeed, float turnSpeed, float maxAngleToTarget,
-            float moveAcceleration = 1.0f, float turnAcceleration = 1.0f, float approachDistance = 1.0f,
-            float retreatDistance = 1.0f)
+        private void Start()
         {
-            _root = root;
-            _target = target;
-            _moveSpeed = moveSpeed * 0.01f;
-            _turnSpeed = turnSpeed;
-            _moveAcceleration = moveAcceleration;
-            _turnAcceleration = turnAcceleration;
-            _maxAngleToTarget = maxAngleToTarget;
-            _approachDistance = approachDistance;
-            _retreatDistance = retreatDistance;
-        }
-
-        /// <summary>
-        ///     <para>Updates root motion parameter values</para>
-        /// </summary>
-        /// <param name="moveSpeed">max movement speed</param>
-        /// <param name="turnSpeed">max turn speed</param>
-        /// <param name="maxAngleToTarget">maximum allowed angle to the target in degrees before rotating to realign</param>
-        /// <param name="moveAcceleration">movement acceleration</param>
-        /// <param name="turnAcceleration">turn acceleration</param>
-        /// <param name="approachDistance">minimum distance before moving to approach the target</param>
-        /// <param name="retreatDistance">minimum distance before retreating from target</param>
-        public void ChangeMotionParameters(float moveSpeed, float turnSpeed, float maxAngleToTarget,
-            float moveAcceleration = 1.0f, float turnAcceleration = 1.0f, float approachDistance = 1.0f,
-            float retreatDistance = 1.0f)
-        {
-            _moveSpeed = moveSpeed * 0.01f;
-            _turnSpeed = turnSpeed;
-            _moveAcceleration = moveAcceleration;
-            _turnAcceleration = turnAcceleration;
-            _maxAngleToTarget = maxAngleToTarget;
-            _approachDistance = approachDistance;
-            _retreatDistance = retreatDistance;
-        }
-
-        /// <summary>
-        ///     <para>Update the second order motion parameters</para>
-        /// </summary>
-        /// <param name="f">frequency of the system</param>
-        /// <param name="z">damping coefficient of the system</param>
-        /// <param name="r">initial response of the system</param>
-        public void SetMovementCoefficients(float f, float z, float r)
-        {
-            fx = f;
-            zx = z;
-            rx = r;
-            Movement = new SecondOrderMotion(fx, zx, rx, Vector3.zero);
+            _movement = new SecondOrderMotion(acceleration, dampening, response, Vector3.zero);
         }
 
         /// <summary>
@@ -96,7 +60,7 @@ namespace Motion
         /// </summary>
         public void UpdateRootMotion()
         {
-            if (Movement == null)
+            if (_movement == null)
                 return;
 
             UpdateOrientation();
@@ -109,32 +73,32 @@ namespace Motion
         private void UpdateOrientation()
         {
             //  Get the direction toward our target
-            var toTarget = _target.position - _root.position;
+            var toTarget = target.position - root.position;
 
             //  Project our direction vector on the local XZ plane
-            _toTargetProjected = Vector3.ProjectOnPlane(toTarget, _root.up);
+            _toTargetProjected = Vector3.ProjectOnPlane(toTarget, root.up);
 
             //  Calculate the angle from our forward direction to our projected target direction
-            _targetAngle = Vector3.SignedAngle(_root.forward, _toTargetProjected, _root.up);
+            _targetAngle = Vector3.SignedAngle(root.forward, _toTargetProjected, root.up);
 
             //  Reset our target angular velocity
             var targetAngularVelocity = 0f;
 
 
             // Check if we need to rotate to face our target
-            if (Mathf.Abs(_targetAngle) > _maxAngleToTarget)
+            if (Mathf.Abs(_targetAngle) > maxAngleToTarget)
                 //  Convert our angle to positive or negative turn speed (Positive angle is clockwise movement)
-                targetAngularVelocity = _targetAngle > 0 ? _turnSpeed : -_turnSpeed;
+                targetAngularVelocity = _targetAngle > 0 ? turnSpeed : -turnSpeed;
 
             // Linearly interpolate between our current angular velocity and our target velocity
             _currentAngularVelocity = Mathf.Lerp(
                 _currentAngularVelocity,
                 targetAngularVelocity,
-                1 - Mathf.Exp(-_turnAcceleration * Time.deltaTime)
+                1 - Mathf.Exp(-turnAcceleration * Time.deltaTime)
             );
 
             // Rotate around the world Y axis to face our target
-            _root.Rotate(0, Time.deltaTime * _currentAngularVelocity, 0, Space.World);
+            root.Rotate(0, Time.deltaTime * _currentAngularVelocity, 0, Space.World);
         }
 
         /// <summary>
@@ -146,24 +110,24 @@ namespace Motion
             var targetVelocity = Vector3.zero;
 
             //  Get the direction toward our target
-            var toTarget = _target.position - _root.position;
+            var toTarget = target.position - root.position;
             //  Project our direction vector on the local XZ plane
-            var toTargetProjected = Vector3.ProjectOnPlane(toTarget, _root.up);
+            var toTargetProjected = Vector3.ProjectOnPlane(toTarget, root.up);
 
             // Ensure we're facing the target prior to moving
             if (Mathf.Abs(_targetAngle) < 45)
             {
-                var targetDistance = Vector3.Distance(_root.position, _target.position);
+                var targetDistance = Vector3.Distance(root.position, Vector3.ProjectOnPlane(target.position, root.up));
 
                 // Use our approach and retreat distances to set our target velocity
-                targetVelocity = _moveSpeed * (targetDistance > _approachDistance ? _toTargetProjected :
-                    targetDistance <= _retreatDistance ? -_toTargetProjected : Vector3.zero).normalized;
+                targetVelocity = moveSpeed * (targetDistance > approachDistance ? toTargetProjected :
+                    targetDistance <= retreatDistance ? -toTargetProjected : Vector3.zero).normalized;
             }
-
+            
             //  Update our velocity using our second order system
-            _currentVelocity = Movement.Update(_moveAcceleration * Time.deltaTime, targetVelocity);
+            _currentVelocity = _movement.Update(Time.deltaTime, targetVelocity);
             // Apply the velocity
-            _root.position += _currentVelocity;
+            root.position += _currentVelocity;
         }
     }
 }

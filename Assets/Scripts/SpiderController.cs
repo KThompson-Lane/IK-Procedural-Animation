@@ -8,31 +8,11 @@ using UnityEngine;
 /// <summary>
 ///     <para>This class is responsible for controlling the spider creature</para>
 /// </summary>
+[RequireComponent(typeof(LookMotion), typeof(LookMotion))]
 public class SpiderController : MonoBehaviour
 {
     //  Spider target transform
     [Header("Target")] [SerializeField] private Transform target;
-
-
-    //  Head tracking parameters
-    [Header("Head tracking")] [SerializeField]
-    private Transform headBone;
-    [SerializeField] private float lookSpeed = 1.0f;
-    [SerializeField] [Range(0f, 90f)] private float lookConstraint = 45.0f;
-
-    //  TODO: 
-    //  Add parameters to tune second-order motion
-    //  Root motion parameters
-    [Header("Root motion")] [SerializeField]
-    private float turnSpeed = 1.0f, turnAcceleration = 1.0f;
-
-    [SerializeField] private float moveSpeed = 1.0f, moveAcceleration = 1.0f;
-    [SerializeField] private float approachDistance = 1.0f, retreatDistance = 1.0f;
-    [SerializeField] [Range(0f, 90f)] private float maxTurnAngle = 45.0f;
-
-    //  Coefficients to tune the second order movement system
-    [Header("Movement coefficients")] [SerializeField]
-    private float fx, zx, rx;
 
     //  Stepper parameters
     [Header("Steppers")]
@@ -53,7 +33,6 @@ public class SpiderController : MonoBehaviour
 
     //  Motion scripts for the head tracking and root motion
     private LookMotion _headTracker;
-
     private Vector3 _lastBodyUp;
     private RootMotion _rootMotion;
 
@@ -63,16 +42,13 @@ public class SpiderController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        _headTracker = new LookMotion(headBone, target, lookConstraint, lookSpeed);
-        _rootMotion = new RootMotion(transform, target, moveSpeed, turnSpeed, maxTurnAngle, moveAcceleration,
-            turnAcceleration, approachDistance, retreatDistance);
-        _rootMotion.SetMovementCoefficients(fx, zx, rx);
-
+        _rootMotion = GetComponent<RootMotion>();
+        _headTracker = GetComponent<LookMotion>();
         foreach (var group in legGroups)
         {
             //  Calculate leg parameters
             //  Step duration is a function of move speed and step distance
-            var stepDuration = group.stepDistance / moveSpeed;
+            var stepDuration = group.stepDistance / (_rootMotion.MoveSpeed() * 200);
             group.legs.ToList().ForEach(leg =>
                 leg.ChangeLegParameters(group.stepDistance, stepDuration, group.overshootAmount));
         }
@@ -128,19 +104,6 @@ public class SpiderController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Debug.DrawRay(rootBone.position, rootBone.up * 20, Color.green);
-    }
-
-    /// <summary>
-    ///     <para>Update the motion parameters for the head tracking and root motion</para>
-    /// </summary>
-    private void OnValidate()
-    {
-        //  Update the motion parameters used by the head and root motion scripts
-        if (_rootMotion == null || _headTracker == null)
-            return;
-        _rootMotion.ChangeMotionParameters(moveSpeed, turnSpeed, maxTurnAngle, moveAcceleration, turnAcceleration,
-            approachDistance, retreatDistance);
-        _headTracker.ChangeMotionParameters(lookConstraint, lookSpeed);
     }
 
     /// <summary>

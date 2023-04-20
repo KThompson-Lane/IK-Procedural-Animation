@@ -11,8 +11,7 @@ namespace Second_Order_Systems
         private float _k1, _k2, _k3;
         private Vector3 _output, _outputDelta;
         private Vector3 _previousInput;
-
-
+        
         /// <summary>
         ///     <para>Creates a new second order motion providing an initial input</para>
         /// </summary>
@@ -45,7 +44,6 @@ namespace Second_Order_Systems
             _k2 = 1 / (2 * Mathf.PI * f * (2 * Mathf.PI * f));
             _k3 = r * z / (2 * Mathf.PI * f);
         }
-
 
         /// <summary>
         ///     <para>
