@@ -405,8 +405,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 1304898702}
-  mask:
+  startPosition: {fileID: 1304898702}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &317884984
@@ -506,9 +506,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 666716594}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &321813722
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,9 +686,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1661221492}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &382926439
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,8 +730,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 1597776015}
-  mask:
+  startPosition: {fileID: 1597776015}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &435555172
@@ -837,9 +831,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1783009436}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &446347204
 GameObject:
   m_ObjectHideFlags: 0
@@ -1020,9 +1011,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 382926440}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &471171399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1120,9 +1108,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1534055547}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &531119178
 GameObject:
   m_ObjectHideFlags: 0
@@ -1317,9 +1302,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 258000230}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &595712065
 GameObject:
   m_ObjectHideFlags: 0
@@ -1459,11 +1441,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 317884987}
-  Pole: {fileID: 1474055223}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 317884987}
+  pole: {fileID: 1474055223}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &637218236 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3969198172140221075, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -1513,8 +1495,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 637218236}
-  mask:
+  startPosition: {fileID: 637218236}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &668806853 stripped
@@ -1534,11 +1516,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 1243213797}
-  Pole: {fileID: 989196886}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 1243213797}
+  pole: {fileID: 989196886}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &668806856 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1016527539247878668, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -1588,8 +1570,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 668806856}
-  mask:
+  startPosition: {fileID: 668806856}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &705507993
@@ -2362,9 +2344,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 689115513}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &1268486574
 GameObject:
   m_ObjectHideFlags: 0
@@ -2480,11 +2459,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 573944158}
-  Pole: {fileID: 595712066}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 573944158}
+  pole: {fileID: 595712066}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &1304898702 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -7086533884533133715, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -2534,8 +2513,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 1629517201}
-  mask:
+  startPosition: {fileID: 1629517201}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!4 &1436336141 stripped
@@ -2643,11 +2622,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 471171402}
-  Pole: {fileID: 321813723}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 471171402}
+  pole: {fileID: 321813723}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &1501786473 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4824230012427693279, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -2697,8 +2676,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 1501786473}
-  mask:
+  startPosition: {fileID: 1501786473}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &1597776012 stripped
@@ -2718,11 +2697,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 447769530}
-  Pole: {fileID: 984284609}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 447769530}
+  pole: {fileID: 984284609}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &1597776015 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5628161050878511183, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -2867,11 +2846,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 1992783224}
-  Pole: {fileID: 1615281266}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 1992783224}
+  pole: {fileID: 1615281266}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &1629517201 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -5447201404053149667, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -2921,8 +2900,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 2130634439}
-  mask:
+  startPosition: {fileID: 2130634439}
+  ground:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &1712196690
@@ -3067,10 +3046,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae771fbef2243247b4deefc162896fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialTransform: {fileID: 2061082610}
-  mask:
+  startPosition: {fileID: 2061082610}
+  ground:
     serializedVersion: 2
     m_Bits: 256
+--- !u!1 &1882284656 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
+  m_PrefabInstance: {fileID: 971345445}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1882284658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882284656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935c17233e6cc474f86f2828415fb221, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 106081166}
+  headBone: {fileID: 157583486}
+  lookSpeed: 1
+  lookConstraint: 45
+  turnSpeed: 15
+  turnAcceleration: 3
+  moveSpeed: 2.3
+  moveAcceleration: 1.12
+  approachDistance: 7.5
+  retreatDistance: 5
+  maxTurnAngle: 15
+  fx: 0.8
+  zx: 0.85
+  rx: -1.1
+  bodyHeightOffset: 2.75
+  rootBone: {fileID: 1436336141}
+  bodyAngleSmoothing: 0.54
+  legGroups:
+  - legs:
+    - {fileID: 1992783225}
+    - {fileID: 435555176}
+    - {fileID: 382132114}
+    stepDistance: 0.7
+    overshootAmount: 0.5
+  - legs:
+    - {fileID: 447769531}
+    - {fileID: 471171403}
+    - {fileID: 317884988}
+    stepDistance: 0.7
+    overshootAmount: 0.5
+  - legs:
+    - {fileID: 1243213798}
+    - {fileID: 573944159}
+    stepDistance: 0.8
+    overshootAmount: 0.55
+  corners:
+  - {fileID: 689115513}
+  - {fileID: 382926440}
+  - {fileID: 258000230}
+  - {fileID: 1413978477}
 --- !u!1 &1992783221
 GameObject:
   m_ObjectHideFlags: 0
@@ -3168,9 +3204,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   home: {fileID: 1413978477}
-  _stepDistance: 0
-  _stepDuration: 0
-  _stepOvershoot: 0
 --- !u!1 &2061082607 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1550337731417334179, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -3188,76 +3221,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 435555175}
-  Pole: {fileID: 446347205}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 435555175}
+  pole: {fileID: 446347205}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &2061082610 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -3456730937257724794, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
   m_PrefabInstance: {fileID: 971345445}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2107783709 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7036213049465896255, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
-  m_PrefabInstance: {fileID: 971345445}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2107783711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2107783709}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 935c17233e6cc474f86f2828415fb221, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 106081166}
-  headBone: {fileID: 157583486}
-  lookSpeed: 1
-  lookConstraint: 45
-  turnSpeed: 15
-  turnAcceleration: 3
-  moveSpeed: 2.3
-  moveAcceleration: 1.12
-  approachDistance: 7.5
-  retreatDistance: 5
-  maxTurnAngle: 15
-  fx: 0.8
-  zx: 0.85
-  rx: -1.1
-  fy: 0.85
-  zy: 0.75
-  ry: -1
-  bodyHeightOffset: 2.75
-  rootBone: {fileID: 1436336141}
-  bodyAngleSmoothing: 0.54
-  legGroups:
-  - legs:
-    - {fileID: 1992783225}
-    - {fileID: 435555176}
-    - {fileID: 382132114}
-    stepDistance: 0.7
-    overshootAmount: 0.5
-  - legs:
-    - {fileID: 447769531}
-    - {fileID: 471171403}
-    - {fileID: 317884988}
-    stepDistance: 0.7
-    overshootAmount: 0.5
-  - legs:
-    - {fileID: 1243213798}
-    - {fileID: 573944159}
-    stepDistance: 0.8
-    overshootAmount: 0.55
-  corners:
-  - {fileID: 689115513}
-  - {fileID: 382926440}
-  - {fileID: 258000230}
-  - {fileID: 1413978477}
 --- !u!4 &2107783712 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8879528566716807029, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}
@@ -3280,11 +3253,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15367ea9f8f6b74db1549412c375533, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChainLength: 3
-  Target: {fileID: 382132113}
-  Pole: {fileID: 930357948}
-  MaxIterations: 10
-  Delta: 0.001
+  chainLength: 3
+  target: {fileID: 382132113}
+  pole: {fileID: 930357948}
+  maxIterations: 10
+  delta: 0.001
 --- !u!4 &2130634439 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5689067252617537341, guid: 9536235694505c94e83b4ab4ee3508e9, type: 3}

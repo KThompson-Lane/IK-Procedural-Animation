@@ -2,185 +2,213 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+///     <para>An IK chain solver which implements the FABRIK method</para>
+/// </summary>
 public class ChainSolver : MonoBehaviour
 {
-    //  Default is two-bone IK
-    public int ChainLength = 2;
+    //  Length of the kinematic chain
+    [SerializeField] private int chainLength = 2;
     
     //  Target and pole transforms
-    public Transform Target;
-    public Transform Pole;
+    [SerializeField] private Transform target;
+    [SerializeField] private Transform pole;
     
     //  Max solver iterations
-    public int MaxIterations = 10;
+    [SerializeField] private int maxIterations = 10;
     
     //  Distance to stop solving
-    public float Delta = 0.001f;
-
+    [SerializeField] private float delta = 0.001f;
     
-    //  Arrays for solving
-    protected float[] BoneLengths; //  Target to origin
-    protected float CompleteLength;
-    protected Transform[] Bones;
-    protected Vector3[] Positions;
+    //  Lengths of each bone (i.e. distance from parent joint to child joint)
+    private float[] _boneLengths; 
+    //  total length of the joint chain
+    private float _completeLength;
+    //  each joint transform
+    private Transform[] _joints;
+    //  joint positions
+    private Vector3[] _positions;
     
-    //  Rotation parameters
-    protected Vector3[] StartDirections;
-    protected Quaternion[] StartRotations;
-    protected Quaternion StartRotationTarget;
-    protected Quaternion StartRotationRoot;
+    //  initial bone directions
+    private Vector3[] _startDirections;
+    //  initial joint rotations
+    private Quaternion[] _startRotations;
+    //  initial rotations for root and target
+    private Quaternion _startRotationTarget, _startRotationRoot;
     
-    
+    /// <summary>
+    ///     <para>Calls init on awake</para>
+    /// </summary>
     private void Awake()
     {
         Init();
     }
 
-    void Init()
+    /// <summary>
+    ///     <para>Initialises the solver storing the joint positions, bone lengths and initial directions and rotations</para> 
+    /// </summary>
+    private void Init()
     {
-        //  An N length IK chain will have N + 1 bone transforms.
-        Bones = new Transform[ChainLength + 1];
-        Positions = new Vector3[ChainLength + 1];
-        BoneLengths = new float[ChainLength];
-        StartDirections = new Vector3[ChainLength + 1];
-        StartRotations = new Quaternion[ChainLength + 1];
-
-        if (Target is null)
+        //  An N length IK chain will have N + 1 joint transforms.
+        _joints = new Transform[chainLength + 1];
+        _boneLengths = new float[chainLength];
+        _startDirections = new Vector3[chainLength + 1];
+        _startRotations = new Quaternion[chainLength + 1];
+        
+        if (target is null)
         {
-            Debug.LogError("Target game object should not be null!");
+            Debug.LogError("IK Target game object is null!");
             return;
         }
-        StartRotationTarget = Target.rotation;
-        
-        
-        CompleteLength = 0.0f;
+        //  Initialise target rotation
+        _startRotationTarget = target.rotation;
 
-        var currentBone = transform;
+        _completeLength = 0.0f;
+
+        //  The chain solver is attached to the end-effector or leaf-joint
+        var currentJoint = transform;
         
-        //  Iterate over joint chain calculating the individual bone lengths and complete chain length.
-        for (var i = ChainLength; i >= 0; i--)
+        //  Traverse joint chain starting at end-effector calculating the individual bone lengths and complete chain length.
+        for (var i = chainLength; i >= 0; i--)
         {
-            Bones[i] = currentBone;
-            StartRotations[i] = currentBone.rotation;
-            var currentPosition = currentBone.position;
-            if (i < ChainLength)
-            {
-                //  mid bone
-                
-                StartDirections[i] = Bones[i+1].position - currentPosition;
-                var boneLength = (Bones[i + 1].position - currentPosition).magnitude;
-                BoneLengths[i] = boneLength;
-                CompleteLength += boneLength;
-            }
+            _joints[i] = currentJoint;
+            _startRotations[i] = currentJoint.rotation;
+            //  Check if current joint is end effector
+            if (i == chainLength)
+                _startDirections[i] = target.position - currentJoint.position;
             else
             {
-                //  leaf bone
-                StartDirections[i] = Target.position - currentPosition;
+                //  Calculate the vector between the current joint and it's child
+                var boneVector = _joints[i+1].position - currentJoint.position;
+                _startDirections[i] = boneVector.normalized;
+                //  Calculate bone length and add it to the total length
+                var boneLength = boneVector.magnitude;
+                _boneLengths[i] = boneLength;
+                _completeLength += boneLength;
             }
-            currentBone = currentBone.parent;
+            //  Set current bone to parent bone
+            currentJoint = currentJoint.parent;
         }
 
     }
 
+    /// <summary>
+    ///     <para>Solve the kinematic chain in late update after all other updates are completed</para>
+    /// </summary>
     private void LateUpdate()
     {
         SolveIK();
     }
-
+    /// <summary>
+    ///     <para>Solve each joint transform to move the end-effector to the target position using the FABRIK method</para>
+    /// </summary>
     private void SolveIK()
     {
-        if (Target is null)
+        if (target is null)
             return;
-        if (BoneLengths.Length != ChainLength)
-        {
+        //  Initialise if not already
+        if (_boneLengths.Length != chainLength) 
             Init();
-        }
-
         
-        //Setup positions array by mapping bone positions to array
-        Positions = Bones.Select(bone => bone.position).ToArray();
+        //Initialise positions array by mapping joint positions to array
+        _positions = _joints.Select(joint => joint.position).ToArray();
         
-        //  Calculate chain positions
-
         //  First check if target position is further than total length of chain
-        var rootToTarget = Target.position - Positions[0];
-        if (rootToTarget.sqrMagnitude >= CompleteLength * CompleteLength)
+        var rootToTarget = target.position - _positions[0];
+        //  Using the square magnitude is more performant
+        if (rootToTarget.sqrMagnitude >= _completeLength * _completeLength)
         {
             //  Stretch chain out as far as possible
             var direction = rootToTarget.normalized;
-            //  Calculate each bone position (except root)
-            for (int i = 1; i < Positions.Length; i++)
+            //  Traverse joint chain starting at the child of the root joint
+            for (int i = 1; i < _positions.Length; i++)
             {
-                //  Position of parent bone, plus direction times by length of parent to current transform.
-                Positions[i] = Positions[i - 1] + direction * BoneLengths[i - 1];
+                //  new position is parent joint position + bone length in the direction of the target
+                _positions[i] = _positions[i - 1] + direction * _boneLengths[i - 1];
             }
         }
-        //  Otherwise start solving
+        //  Otherwise begin solving
         else
         {
-            for (var iteration = 0; iteration < MaxIterations; iteration++)
+            for (var iteration = 0; iteration < maxIterations; iteration++)
             {
-                //  Backward IK
-                for (var i = ChainLength; i > 0; i--)
+                //  Backward step
+                
+                //  First set end effector to target position
+                _positions[chainLength] = target.position;
+                
+                //  Then traverse joint chain starting at the end-effector parent
+                for (var i = chainLength-1; i > 0; i--)
                 {
-                    if (i == ChainLength)
-                        Positions[i] = Target.position;
-                    else
-                    {
-                        //  Position of child bone, plus direction from child to current bone, times by length of current bone
-                        Positions[i] = Positions[i + 1] + (Positions[i] - Positions[i + 1]).normalized * BoneLengths[i];
-                    }
+                    //  Direction of child joint to current joint
+                    var childToCurrent = (_positions[i] - _positions[i + 1]).normalized;
+                    //  Set position to child joint plus bone length in the direction of the child to this joint.
+                    _positions[i] = _positions[i + 1] + childToCurrent * _boneLengths[i];
                 }
                 
-                //  Forward IK
-                for (int i = 1; i < Positions.Length; i++)
+                //  Forward step
+                //  Traverse the joint chain starting at root joint child
+                for (int i = 1; i < _positions.Length; i++)
                 {
-                    //  Position of parent bone, plus direction from parent to current bone, times by length of parent bone
-                    Positions[i] = Positions[i-1] + (Positions[i] - Positions[i - 1]).normalized * BoneLengths[i-1];
+                    //  Direction of parent joint to current joint
+                    var parentToCurrent = (_positions[i] - _positions[i - 1]).normalized;
+                    //  Set position to parent joint plus bone length in direction of parent to current joint.
+                    _positions[i] = _positions[i-1] + parentToCurrent * _boneLengths[i-1];
                 }
-
-                if ((Positions[^1] - Target.position).sqrMagnitude < Delta * Delta)
+                
+                //  Check if end effector is within minimum distance to target
+                //      Again using square magnitude for performance
+                if ((_positions[^1] - target.position).sqrMagnitude < delta * delta)
                     break;
             }
         }
         
-        //  Account for pole
-        if (Pole is not null)
+        //  Factor in pole
+        if (pole is not null)
         {
-            // We are only interested in the bones between the first and last one
-            for (int i = 1; i < Positions.Length - 1; i++) 
+            //  Only modify the joints between the root and end effector
+            for (int i = 1; i < _positions.Length - 1; i++) 
             {
-                var plane = new Plane(Positions[i + 1] - Positions[i - 1], Positions[i - 1]);
-                var projectedPole = plane.ClosestPointOnPlane(Pole.position);
-                var projectedBone = plane.ClosestPointOnPlane(Positions[i]);
+                //  TODO: CHECK THE PLANE EQUATION IS CORRECT
+                //  Create a plane with the normal being the direction from the parent joint to the child joint
+                //  and the point being the position of the child joint
+                var plane = new Plane(_positions[i + 1] - _positions[i - 1], _positions[i - 1]);
+                
+                //  project the pole and joint onto the plane
+                var projectedPole = plane.ClosestPointOnPlane(pole.position);
+                var projectedJoint = plane.ClosestPointOnPlane(_positions[i]);
                 
                 
-                // Get the angle between the projected bone and the projected pole relative to the plane normal
-                var angle = Vector3.SignedAngle(projectedBone - Positions[i - 1], projectedPole - Positions[i - 1],
+                // Get the angle between the projected joint and pole relative to the plane normal
+                var angle = Vector3.SignedAngle(projectedJoint - _positions[i - 1], projectedPole - _positions[i - 1],
                     plane.normal);
                 
-                //  Use that angle to rotate the bone position about the plane normal such that it is close to the pole.
-                Positions[i] = Quaternion.AngleAxis(angle, plane.normal) * (Positions[i] - Positions[i - 1]) +
-                               Positions[i - 1];
+                //  Use that angle to rotate the joint position about the plane normal such that it is close to the pole
+                _positions[i] = Quaternion.AngleAxis(angle, plane.normal) * (_positions[i] - _positions[i - 1]) +
+                               _positions[i - 1];
             }
         }
         
-        //  Set bone positions to new solved positions
-        for (var i = 0; i < Positions.Length; i++)
+        //  Update joint positions to new solved positions
+        for (var i = 0; i < _positions.Length; i++)
         {
-            if (i == Positions.Length - 1)
-                Bones[i].rotation = Target.rotation * Quaternion.Inverse(StartRotationTarget) * StartRotations[i];
+            if (i == _positions.Length - 1)
+                _joints[i].rotation = target.rotation * Quaternion.Inverse(_startRotationTarget) * _startRotations[i];
             else
-                Bones[i].rotation = Quaternion.FromToRotation(StartDirections[i], Positions[i+1] - Positions[i]) * StartRotations[i];
-            Bones[i].position = Positions[i];
+                _joints[i].rotation = Quaternion.FromToRotation(_startDirections[i], _positions[i+1] - _positions[i]) * _startRotations[i];
+            _joints[i].position = _positions[i];
         }
 
     }
-
+    /// <summary>
+    ///     <para>Debug method to draw bone gizmos</para>
+    /// </summary>
     private void OnDrawGizmos()
     {
         var currentTransform = transform;
-        for (var i = 0; i < ChainLength && currentTransform.parent != null; i++)
+        
+        //  Traverse joint chain drawing bones as wire cubes
+        for (var i = 0; i < chainLength && currentTransform.parent != null; i++)
         {
             var parentPosition = currentTransform.parent.position;
             var currentPosition = currentTransform.position;

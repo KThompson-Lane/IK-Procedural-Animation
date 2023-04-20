@@ -1,43 +1,51 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
 using UnityEngine;
 
+/// <summary>
+/// <para>This class is responsible for controlling the spider creature</para>
+/// </summary>
 public class SpiderController : MonoBehaviour
 {
+    //  Spider target transform
     [Header("Target")]
     [SerializeField] Transform target;
     
+    
+    //  Head tracking parameters
     [Header("Head tracking")]
     [SerializeField] Transform headBone;
     [SerializeField] float lookSpeed = 1.0f;
     [SerializeField] [Range(0f, 90f)] float lookConstraint = 45.0f;
     
     //  TODO: 
-    //  Add parameter for following distance
     //  Add parameters to tune second-order motion
+    //  Root motion parameters
     [Header("Root motion")]
     [SerializeField] float turnSpeed = 1.0f, turnAcceleration = 1.0f;
     [SerializeField] float moveSpeed = 1.0f, moveAcceleration = 1.0f;
     [SerializeField] float approachDistance = 1.0f, retreatDistance = 1.0f;
     [SerializeField] [Range(0f, 90f)] float maxTurnAngle = 45.0f;
     
+    //  Coefficients to tune the second order movement system
     [Header("Movement coefficients")]
     [SerializeField] 
     private float fx,zx,rx;
-    
-    [Header("Orientation coefficients")]
-    [SerializeField]
-    private float fy,zy,ry;
-    
-    [Header("Leg Steppers")]
-    //  Leg stepper parameters
+
+    //  Stepper parameters
+    [Header("Steppers")]
+    //  height offset for the body relative to the feet joints
     [SerializeField] private float bodyHeightOffset = 2.75f;
     [SerializeField] Transform rootBone;
+    //  Smoothing factor to apply to body orientation matching
     [SerializeField] [Range(0f, 7f)] float bodyAngleSmoothing = 1f;
-    //  Leg groups are groups of individual legs which move together
+    
+    
+    /// <summary>
+    /// A struct representing groups of legs that move in parallel
+    /// </summary>
     [Serializable]
     public struct LegGroup
     {
@@ -46,18 +54,21 @@ public class SpiderController : MonoBehaviour
         public float overshootAmount;
     }
     
-    //  Array of leg pairs
-
+    //  Array of leg groups
     [SerializeField] private LegGroup[] legGroups;
     
+    //  Motion scripts for the head tracking and root motion
     private LookMotion _headTracker;
     private RootMotion _rootMotion;
-
-    private Vector3 _lastBodyUp;
-    [SerializeField] private Transform[] corners;
     
-    // We do all animation code in LateUpdate
-    // This ensures it has the latest object data prior to frame drawing
+    private Vector3 _lastBodyUp;
+    //  Corner legs used for body orientation
+    [SerializeField] private Transform[] corners;
+
+
+    /// <summary>
+    ///     <para>Initialise the head tracking, root motion and leg steppers</para>
+    /// </summary>
     private void Awake()
     {
         _headTracker = new(headBone, target, lookConstraint, lookSpeed);
@@ -75,6 +86,9 @@ public class SpiderController : MonoBehaviour
         _lastBodyUp = rootBone.up;
     }
 
+    /// <summary>
+    ///     <para>Update the motion parameters for the head tracking and root motion</para> 
+    /// </summary>
     private void OnValidate()
     {
         //  Update the motion parameters used by the head and root motion scripts
@@ -84,16 +98,26 @@ public class SpiderController : MonoBehaviour
         _headTracker.ChangeMotionParameters(lookConstraint, lookSpeed);
     }
 
+    
+    /// <summary>
+    ///     <para>Update the root motion and head tracking before adjusting the body position and orientation.</para>
+    /// </summary>
+    /// <remarks>We perform this in late update as it will ensure we have the most recent data</remarks>
     void LateUpdate()
     {
         _rootMotion.UpdateRootMotion();
-        _headTracker.UpdateHeadMotion();
+        _headTracker.UpdateLookMotion();
         
-        //  Determine body position relative to legs.
+        //  Determine body position relative to legs
         var startPosition = rootBone.position;
-        var averagePosition = legGroups.SelectMany(group => group.legs).Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legGroups.SelectMany(group => group.legs).Count();
+        //  Calculate the average position of all legs
+        var averagePosition = legGroups.SelectMany(group => group.legs)
+            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legGroups.SelectMany(group => group.legs).Count();
         
+        //  Calculate the end position by applying our body offset
         var endPosition = averagePosition + new Vector3(0,bodyHeightOffset);
+        
+        //  Calculate the centre of the body position before interpolating toward it
         var centre = (startPosition + endPosition) / 2;
         rootBone.position =
             Vector3.Lerp(
@@ -101,27 +125,27 @@ public class SpiderController : MonoBehaviour
                 Vector3.Lerp(centre, averagePosition + new Vector3(0,bodyHeightOffset),  Time.deltaTime),
                 Time.deltaTime
             );
-        
-        
+
         //  Orient body based on corner leg positions
-        Vector3 v1 = corners[0].position - corners[1].position;
-        Vector3 v2 = corners[2].position - corners[3].position;
-        //  Calculate the cross product based on the vectors between the diagonally opposed legs
+        var v1 = corners[0].position - corners[1].position;
+        var v2 = corners[2].position - corners[3].position;
+        //  Calculate the cross product of the vectors between diagonally opposed legs
         var normal = Vector3.Cross(v1, v2).normalized;
         
-        //  Interpolate the vector to smooth it
-        Vector3 newUp = Vector3.Lerp(_lastBodyUp, normal, 1f / (bodyAngleSmoothing + 1));
+        //  Interpolate the vector to smooth it and apply it to our local rotation
+        var newUp = Vector3.Lerp(_lastBodyUp, normal, 1f / (bodyAngleSmoothing + 1));
         rootBone.localRotation = Quaternion.FromToRotation(Vector3.up, newUp);
         _lastBodyUp = newUp;
     }
+    /// <summary>
+    ///     <para>Try and move each group of legs</para>
+    /// </summary>
     private IEnumerator MoveLegs()
     {
         while (true)
         {
-            // Try moving each group of legs
             foreach (var group in legGroups)
             {
-              
                 foreach (var leg in group.legs)
                 {
                     leg.TryStep();
@@ -135,6 +159,9 @@ public class SpiderController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    ///     <para>Debug method for drawing the body orientation</para>
+    /// </summary>
     private void OnDrawGizmos()
     {
         Debug.DrawRay(rootBone.position, rootBone.up * 20, Color.green);
