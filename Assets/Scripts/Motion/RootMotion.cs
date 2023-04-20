@@ -1,6 +1,5 @@
 ﻿using Second_Order_Systems;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Motion
 {
@@ -25,8 +24,6 @@ namespace Motion
         [SerializeField] private float moveSpeed;
         /// <value>max turn speed</value>
         [SerializeField] private float turnSpeed;
-        /// <value>turn acceleration</value>
-        [SerializeField] private float turnAcceleration;
         
         /// <value>frequency of the system</value>
         [Header("Movement parameters")]
@@ -36,6 +33,12 @@ namespace Motion
         /// <value>initial response of the system</value>
         [SerializeField] private float response;
         
+        [Header("Orientation parameters")]
+        [SerializeField] private float turnAcceleration;
+        /// <value>damping coefficient of the system</value>
+        [SerializeField] private float turnDampening;
+        /// <value>initial response of the system</value>
+        [SerializeField] private float turnInertia;
         /// <summary>
         /// Gets the root motion move speed value
         /// </summary>
@@ -45,11 +48,16 @@ namespace Motion
         
         private float _currentAngularVelocity;
         private Vector3 _currentVelocity = Vector3.zero;
-        private SecondOrderMotion _movement;
+        private SecondOrderMotion<Vector3> _movement;
+        private SecondOrderMotion<float> _orientation;
 
+        /// <summary>
+        ///     <para>Create second order motion systems for movement and orientation</para>
+        /// </summary>
         private void Start()
         {
-            _movement = new SecondOrderMotion(acceleration, dampening, response, Vector3.zero);
+            _movement = new SecondOrderVector(acceleration, dampening, response, Vector3.zero);
+            _orientation = new SecondOrderFloat(turnAcceleration, turnDampening, turnInertia, 0f);
         }
 
         /// <summary>
@@ -76,16 +84,11 @@ namespace Motion
                 targetAngularVelocity = targetAngle > 0 ? turnSpeed : -turnSpeed;
 
             
-            //  TODO: Replace this with another second order motion system
-            //  Linearly interpolate between our current angular velocity and our target velocity
-            _currentAngularVelocity = Mathf.Lerp(
-                _currentAngularVelocity,
-                targetAngularVelocity,
-                1 - Mathf.Exp(-turnAcceleration * Time.deltaTime)
-            );
+            //  Update our velocity using the orientation system
+            _currentAngularVelocity = _orientation.Update(Time.deltaTime, targetAngularVelocity);
 
             //  Rotate around the global Y axis to face our target
-            root.Rotate(0, Time.deltaTime * _currentAngularVelocity, 0, Space.World);
+            root.Rotate(0, _currentAngularVelocity, 0, Space.World);
             
             //  Ensure we're facing the target before moving
             if (Mathf.Abs(targetAngle) < 45)
@@ -101,6 +104,15 @@ namespace Motion
             _currentVelocity = _movement.Update(Time.deltaTime, targetVelocity);
             //  Apply the velocity
             root.position += _currentVelocity;
+        }
+
+        /// <summary>
+        ///     <para>Update the motion systems when paramaters change</para>
+        /// </summary>
+        private void OnValidate()
+        {
+            _movement?.CalculateKValues(acceleration,dampening,response);
+            _orientation?.CalculateKValues(turnAcceleration,turnDampening,turnInertia);
         }
     }
 }

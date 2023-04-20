@@ -12,12 +12,12 @@ namespace Second_Order_Systems
         [Header("Orientation coefficients")] [SerializeField]
         private float fy, zy, ry;
 
-        private SecondOrderMotion _movement, _orientation;
+        private SecondOrderMotion<Vector3> _movement, _orientation;
 
         private void Awake()
         {
-            _movement = new SecondOrderMotion(fx, zx, rx, transform.position);
-            _orientation = new SecondOrderMotion(fy, zy, ry, transform.up);
+            _movement = new SecondOrderVector(fx, zx, rx, transform.position);
+            _orientation = new SecondOrderVector(fy, zy, ry, transform.up);
         }
 
         private void FixedUpdate()

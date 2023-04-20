@@ -3112,12 +3112,13 @@ MonoBehaviour:
   approachDistance: 9.91
   retreatDistance: 4.56
   moveSpeed: 0.024
-  turnSpeed: 45
-  moveAcceleration: 0.507
-  turnAcceleration: 4
-  f: 2.08
-  z: 1.51
-  r: -0.42
+  turnSpeed: 0.36
+  acceleration: 2.08
+  dampening: 1.51
+  response: -0.42
+  turnAcceleration: 0.94
+  turnDampening: 1.06
+  turnInertia: 0.31
 --- !u!114 &1882284660
 MonoBehaviour:
   m_ObjectHideFlags: 0

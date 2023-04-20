@@ -5,12 +5,12 @@ namespace Second_Order_Systems
     /// <summary>
     ///     <para>Uses second order time derivatives to create dampening behaviours</para>
     /// </summary>
-    public class SecondOrderMotion
+    public abstract class SecondOrderMotion<T>
     {
         //  Second order coefficients
-        private float _k1, _k2, _k3;
-        private Vector3 _output, _outputDelta;
-        private Vector3 _previousInput;
+        protected float K1, K2, K3;
+        protected T Output, OutputDelta;
+        protected T PreviousInput;
         
         /// <summary>
         ///     <para>Creates a new second order motion providing an initial input</para>
@@ -19,11 +19,11 @@ namespace Second_Order_Systems
         /// <param name="z">damping coefficient of the system</param>
         /// <param name="r">initial response of the system</param>
         /// <param name="initialInput">initial input to the system</param>
-        public SecondOrderMotion(float f, float z, float r, Vector3 initialInput)
+        protected SecondOrderMotion(float f, float z, float r, T initialInput)
         {
-            _previousInput = initialInput;
-            _output = initialInput;
-            _outputDelta = initialInput;
+            PreviousInput = initialInput;
+            Output = initialInput;
+            OutputDelta = initialInput;
             CalculateKValues(f, z, r);
         }
 
@@ -40,9 +40,9 @@ namespace Second_Order_Systems
         /// <param name="r">initial response of the system</param>
         public void CalculateKValues(float f, float z, float r)
         {
-            _k1 = z / (Mathf.PI * f);
-            _k2 = 1 / (2 * Mathf.PI * f * (2 * Mathf.PI * f));
-            _k3 = r * z / (2 * Mathf.PI * f);
+            K1 = z / (Mathf.PI * f);
+            K2 = 1 / (2 * Mathf.PI * f * (2 * Mathf.PI * f));
+            K3 = r * z / (2 * Mathf.PI * f);
         }
 
         /// <summary>
@@ -52,24 +52,13 @@ namespace Second_Order_Systems
         ///     </para>
         /// </summary>
         /// <param name="T">Time-step of the system</param>
-        /// <param name="input">Input vector</param>
+        /// <param name="input">Input</param>
         /// <param name="inputDelta">Optional input delta or velocity</param>
-        /// <returns>A vector representing the input after undergoing motion</returns>
+        /// <returns>A value representing the input after undergoing motion</returns>
         /// <remarks>
         ///     If <paramref name="inputDelta" /> is not provided, it will be estimated using the previous input and the
         ///     time-step <paramref name="T" />
         /// </remarks>
-        public Vector3 Update(float T, Vector3 input, Vector3 inputDelta = default)
-        {
-            if (inputDelta == default)
-            {
-                inputDelta = (input - _previousInput) / T;
-                _previousInput = input;
-            }
-
-            _output = _output + T * _outputDelta;
-            _outputDelta = _outputDelta + T * (input + _k3 * inputDelta - _output - _k1 * _outputDelta) / _k2;
-            return _output;
-        }
+        public abstract T Update(float T, T input, T inputDelta = default);
     }
 }
