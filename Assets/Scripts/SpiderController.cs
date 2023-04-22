@@ -8,7 +8,6 @@ using UnityEngine;
 /// <summary>
 ///     <para>This class is responsible for controlling the spider creature</para>
 /// </summary>
-[RequireComponent(typeof(LookMotion), typeof(LookMotion))]
 public class SpiderController : MonoBehaviour
 {
     //  Spider target transform
@@ -64,8 +63,10 @@ public class SpiderController : MonoBehaviour
     /// <remarks>We perform this in late update as it will ensure we have the most recent data</remarks>
     private void LateUpdate()
     {
-        _rootMotion.UpdateRootMotion();
-        _headTracker.UpdateLookMotion();
+        if(_rootMotion != null)
+            _rootMotion.UpdateRootMotion();
+        if(_headTracker != null)
+            _headTracker.UpdateLookMotion();
 
         //  Determine body position relative to legs
         var startPosition = rootBone.position;

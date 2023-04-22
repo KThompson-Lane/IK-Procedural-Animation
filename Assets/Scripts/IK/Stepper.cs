@@ -117,7 +117,7 @@ namespace IK
 
                 //  Calculate time-step using the step duration and our total time elapsed
                 var T = timeElapsed / _stepDuration;
-                // Interpolate transform quadratically using nested Lerps
+                // Interpolate transform bi-linearly using nested Lerps
                 transform.position =
                     Vector3.Lerp(
                         Vector3.Lerp(initialPosition, stepCentre, T),

@@ -28,6 +28,9 @@ namespace IK
         //  total length of the joint chain
         private float _completeLength;
 
+        //  position of pole
+        private Vector3 _polePosition;
+
         //  each joint transform
         private Transform[] _joints;
 
@@ -194,30 +197,39 @@ namespace IK
                 }
             }
 
-            //  Factor in pole
-            if (pole is not null)
-                //  Only modify the joints between the root and end effector
-                for (var i = 1; i < _positions.Length - 1; i++)
-                {
-                    //  TODO: CHECK THE PLANE EQUATION IS CORRECT
-                    //  Create a plane with the normal being the direction from the parent joint to the child joint
-                    //  and the point being the position of the child joint
-                    var plane = new Plane(_positions[i + 1] - _positions[i - 1], _positions[i - 1]);
+            //  If pole isn't set, approximate it
+            if (pole == null)
+            {
+                var centre = (_joints[0].position + _joints[^1].position) / 2;
+                centre.y += 100;
+                _polePosition = centre;
+            }
+            else
+            {
+                _polePosition = pole.position;
+            }
+            
+            //  Only modify the joints between the root and end effector
+            for (var i = 1; i < _positions.Length - 1; i++)
+            {
+                //  Create a plane with the normal being the direction from the parent joint to the child joint
+                //  and the point being the position of the child joint
+                var plane = new Plane(_positions[i + 1] - _positions[i - 1], _positions[i - 1]);
 
-                    //  project the pole and joint onto the plane
-                    var projectedPole = plane.ClosestPointOnPlane(pole.position);
-                    var projectedJoint = plane.ClosestPointOnPlane(_positions[i]);
+                //  project the pole and joint onto the plane
+                var projectedPole = plane.ClosestPointOnPlane(_polePosition);
+                var projectedJoint = plane.ClosestPointOnPlane(_positions[i]);
 
 
-                    // Get the angle between the projected joint and pole relative to the plane normal
-                    var angle = Vector3.SignedAngle(projectedJoint - _positions[i - 1],
-                        projectedPole - _positions[i - 1],
-                        plane.normal);
+                // Get the angle between the projected joint and pole relative to the plane normal
+                var angle = Vector3.SignedAngle(projectedJoint - _positions[i - 1],
+                    projectedPole - _positions[i - 1],
+                    plane.normal);
 
-                    //  Use that angle to rotate the joint position about the plane normal such that it is close to the pole
-                    _positions[i] = Quaternion.AngleAxis(angle, plane.normal) * (_positions[i] - _positions[i - 1]) +
-                                    _positions[i - 1];
-                }
+                //  Use that angle to rotate the joint position about the plane normal such that it is close to the pole
+                _positions[i] = Quaternion.AngleAxis(angle, plane.normal) * (_positions[i] - _positions[i - 1]) +
+                                _positions[i - 1];
+            }
 
             //  Update joint positions to new solved positions
             for (var i = 0; i < _positions.Length; i++)
