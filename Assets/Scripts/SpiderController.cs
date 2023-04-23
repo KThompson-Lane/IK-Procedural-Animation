@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using IK;
 using Motion;
+using Second_Order_Systems;
 using UnityEngine;
 
 /// <summary>
@@ -21,9 +22,6 @@ public class SpiderController : MonoBehaviour
 
     [SerializeField] private Transform rootBone;
 
-    //  Smoothing factor to apply to body orientation matching
-    [SerializeField] [Range(0f, 7f)] private float bodyAngleSmoothing = 1f;
-
     //  Array of leg groups
     [SerializeField] private LegGroup[] legGroups;
 
@@ -32,28 +30,36 @@ public class SpiderController : MonoBehaviour
 
     //  Motion scripts for the head tracking and root motion
     private LookMotion _headTracker;
-    private Vector3 _lastBodyUp;
-    private RootMotion _rootMotion;
-
-
+    private Locomotion _locomotion;
+    
+    /// <value>frequency of the system</value>
+    [Header("Root motion parameters")]
+    [SerializeField] private float frequency;
+    /// <value>damping coefficient of the system</value>
+    [SerializeField] private float damping;
+    /// <value>initial response of the system</value>
+    [SerializeField] private float initialResponse;
+    
+    //  Script for tracking body orientation
+    private SecondOrderMotion<Vector3> _rootMotion;
     /// <summary>
     ///     <para>Initialise the head tracking, root motion and leg steppers</para>
     /// </summary>
     private void Awake()
     {
-        _rootMotion = GetComponent<RootMotion>();
+        _locomotion = GetComponent<Locomotion>();
         _headTracker = GetComponent<LookMotion>();
         foreach (var group in legGroups)
         {
             //  Calculate leg parameters
             //  Step duration is a function of move speed and step distance
-            var stepDuration = group.stepDistance / (_rootMotion.MoveSpeed() * 200);
+            var stepDuration = group.stepDistance / (_locomotion.MoveSpeed() * 200);
             group.legs.ToList().ForEach(leg =>
                 leg.ChangeLegParameters(group.stepDistance, stepDuration, group.overshootAmount));
         }
 
         StartCoroutine(MoveLegs());
-        _lastBodyUp = rootBone.up;
+        _rootMotion = new SecondOrderVector(frequency, damping, initialResponse, rootBone.position);
     }
 
 
@@ -63,40 +69,39 @@ public class SpiderController : MonoBehaviour
     /// <remarks>We perform this in late update as it will ensure we have the most recent data</remarks>
     private void LateUpdate()
     {
-        if(_rootMotion != null)
-            _rootMotion.UpdateRootMotion();
+        if(_locomotion != null)
+            _locomotion.Move();
         if(_headTracker != null)
             _headTracker.UpdateLookMotion();
 
+        //  Finally, apply root motion using our leg positions
+        UpdateRootMotion();
+    }
+
+    private void UpdateRootMotion()
+    {
+        
         //  Determine body position relative to legs
-        var startPosition = rootBone.position;
         //  Calculate the average position of all legs
+        var legCount = legGroups.SelectMany(group => group.legs).Count();
         var averagePosition = legGroups.SelectMany(group => group.legs)
-                                  .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) /
-                              legGroups.SelectMany(group => group.legs).Count();
-
-        //  Calculate the end position by applying our body offset
+            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legCount;
+        
+        //  Raise the end position by our body heightOffset
         var endPosition = averagePosition + new Vector3(0, bodyHeightOffset);
-
-        //  Calculate the centre of the body position before interpolating toward it
-        var centre = (startPosition + endPosition) / 2;
-        rootBone.position =
-            Vector3.Lerp(
-                Vector3.Lerp(startPosition, centre, Time.deltaTime),
-                Vector3.Lerp(centre, averagePosition + new Vector3(0, bodyHeightOffset), Time.deltaTime),
-                Time.deltaTime
-            );
-
+        
+        //  Update our body position
+        rootBone.position = _rootMotion.Update(Time.deltaTime, endPosition);
+        
         //  Orient body based on corner leg positions
         var v1 = corners[0].position - corners[1].position;
         var v2 = corners[2].position - corners[3].position;
         //  Calculate the cross product of the vectors between diagonally opposed legs
         var normal = Vector3.Cross(v1, v2).normalized;
-
+        
         //  Interpolate the vector to smooth it and apply it to our local rotation
-        var newUp = Vector3.Lerp(_lastBodyUp, normal, 1f / (bodyAngleSmoothing + 1));
-        rootBone.localRotation = Quaternion.FromToRotation(Vector3.up, newUp);
-        _lastBodyUp = newUp;
+        //var newUp = _bodyOrientation.Update(Time.deltaTime, normal);
+        rootBone.localRotation = Quaternion.FromToRotation(Vector3.up, normal);
     }
 
     /// <summary>

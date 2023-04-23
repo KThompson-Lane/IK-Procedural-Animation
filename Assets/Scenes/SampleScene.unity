@@ -2374,7 +2374,6 @@ MonoBehaviour:
   target: {fileID: 106081166}
   bodyHeightOffset: 2.75
   rootBone: {fileID: 1436336141}
-  bodyAngleSmoothing: 0.54
   legGroups:
   - legs:
     - {fileID: 1992783225}
@@ -2398,6 +2397,9 @@ MonoBehaviour:
   - {fileID: 382926440}
   - {fileID: 258000230}
   - {fileID: 1413978477}
+  frequency: 1
+  damping: 0.8
+  initialResponse: 1.19
 --- !u!114 &1882284659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2410,7 +2412,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45facf40c1c44669bb22ab3da1de84c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  root: {fileID: 2107783712}
   target: {fileID: 106081166}
   maxAngleToTarget: 15
   approachDistance: 9.91
