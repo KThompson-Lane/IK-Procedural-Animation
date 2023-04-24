@@ -83,10 +83,9 @@ namespace Motion
                 //  Convert our angle to positive or negative turn speed (Positive angle is clockwise movement)
                 targetAngularVelocity = targetAngle > 0 ? turnSpeed : -turnSpeed;
 
-            
             //  Update our velocity using the orientation system
             _currentAngularVelocity = _orientation.Update(Time.deltaTime, targetAngularVelocity);
-
+            
             //  Rotate around the global Y axis to face our target
             transform.Rotate(0, _currentAngularVelocity, 0, Space.World);
             

@@ -113,14 +113,12 @@ namespace IK
         {
             //  Indicate a step has started
             _moving = true;
-            
-            
-            
+
             //  Calculate centre point
             var stepCentre = (transform.position + targetPosition) / 2;
 
             //  Raise centre point slightly to give the step some lift
-            stepCentre += transform.up * Vector3.Distance(initialPosition, targetPosition) / 2f;
+            stepCentre += Vector3.up * Vector3.Distance(initialPosition, targetPosition) / 2f;
 
             // Time since step started
             var timeElapsed = 0f;

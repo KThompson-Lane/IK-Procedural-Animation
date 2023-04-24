@@ -285,7 +285,7 @@ MonoBehaviour:
   Stepper: {fileID: 93389602}
   Solver: {fileID: 1671599621}
   Group: 1
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &396650612 stripped
 GameObject:
@@ -374,7 +374,7 @@ MonoBehaviour:
   Stepper: {fileID: 417450164}
   Solver: {fileID: 396650614}
   Group: 2
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &419363773
 GameObject:
@@ -441,7 +441,7 @@ MonoBehaviour:
   Stepper: {fileID: 419363775}
   Solver: {fileID: 1195996542}
   Group: 2
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &474857581
 GameObject:
@@ -508,7 +508,7 @@ MonoBehaviour:
   Stepper: {fileID: 474857583}
   Solver: {fileID: 1391551033}
   Group: 1
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &632113269
 GameObject:
@@ -575,7 +575,7 @@ MonoBehaviour:
   Stepper: {fileID: 632113271}
   Solver: {fileID: 1218848090}
   Group: 1
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &753050602
 GameObject:
@@ -1138,7 +1138,7 @@ MonoBehaviour:
   Stepper: {fileID: 1192221397}
   Solver: {fileID: 1315026314}
   Group: 3
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &1195996540 stripped
 GameObject:
@@ -1279,7 +1279,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1253055751}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.47, y: 0, z: 5.53}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1553,7 +1553,7 @@ MonoBehaviour:
   Stepper: {fileID: 1469930905}
   Solver: {fileID: 956951793}
   Group: 3
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &1671599619 stripped
 GameObject:
@@ -1810,7 +1810,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookJoint: {fileID: 1124576365}
   target: {fileID: 0}
-  lookSpeed: 1
+  lookSpeed: 1.79
   lookConstraint: 35
 --- !u!114 &1918750912
 MonoBehaviour:
@@ -1829,7 +1829,7 @@ MonoBehaviour:
   approachDistance: 9.53
   retreatDistance: 4
   moveSpeed: 0.05
-  turnSpeed: 0.33
+  turnSpeed: 0.48
   acceleration: 1.2
   dampening: 1.24
   response: -0.91
@@ -1849,11 +1849,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1253055755}
-  frequency: 1.39
+  frequency: 2.5
   damping: 1.17
   initialResponse: 0
   rootBone: {fileID: 1211526606}
-  bodyHeightOffset: 1.56
+  rootOffset: {x: 0, y: 0, z: 0}
   Legs:
   - {fileID: 93389603}
   - {fileID: 1999497987}
@@ -1971,7 +1971,7 @@ MonoBehaviour:
   Stepper: {fileID: 1999497986}
   Solver: {fileID: 1372349367}
   Group: 2
-  StepDistance: 0.8
+  StepDistance: 1.15
   overshootAmount: 0.5
 --- !u!1 &2029817814
 GameObject:

@@ -25,7 +25,7 @@ public class SpiderController : MonoBehaviour
     //  Stepper parameters
     [Header("Steppers")]
     [SerializeField] private Transform rootBone;
-    [SerializeField] private float bodyHeightOffset;
+    [SerializeField] private Vector3 rootOffset;
     public Leg[] Legs;
 
     //  Motion scripts for the head tracking and root motion
@@ -53,7 +53,8 @@ public class SpiderController : MonoBehaviour
         }
         StartCoroutine(MoveLegs());
         _rootMotion = new SecondOrderVector(frequency, damping, initialResponse, rootBone.position);
-
+        //  Calculate body height offset
+        rootOffset = rootBone.position;
     }
 
 
@@ -63,32 +64,35 @@ public class SpiderController : MonoBehaviour
     /// <remarks>We perform this in late update as it will ensure we have the most recent data</remarks>
     private void LateUpdate()
     {
-        UpdateRootMotion(); 
         if(_locomotion != null)
             _locomotion.Move();
         if(_headTracker != null)
             _headTracker.UpdateLookMotion();
+        //  Finally apply root motion
+        UpdateRootMotion();
+    }
 
-        //  Finally, apply root motion using our leg positions
-        
+    private void OnValidate()
+    {
+        if(_rootMotion != null)
+            _rootMotion.CalculateKValues(frequency, damping, initialResponse);
     }
 
     private void UpdateRootMotion()
     {
-        //  Determine body position relative to legs
-        //  Calculate the average position of all legs
-        var legCount = Legs.Length;
-        var averagePosition = Legs
-            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / legCount;
+        //  Determine root bone position relative to legs
         
-        if (Physics.Raycast(averagePosition + Vector3.up * 10, Vector3.down, out var hit, 20))
+        //  Calculate the average position of all legs
+        var averagePosition = Legs
+            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / Legs.Length;
+        
+        //  Raycast to account for terrain height
+        if (Physics.Raycast(averagePosition + Vector3.up * 2, Vector3.down, out var hit, 5))
         {
             averagePosition = hit.point;
         }
+        rootBone.position = _rootMotion.Update(Time.deltaTime, averagePosition + rootOffset);
 
-        averagePosition += rootBone.up * bodyHeightOffset;
-        //  Update our body position
-        rootBone.position = _rootMotion.Update(Time.deltaTime, averagePosition);
     }
     
     /// <summary>
