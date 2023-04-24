@@ -4,9 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - EndEffector
-  - Left
-  - Right
+  - Foot
+  - Root
+  - Legs
+  - Target
   layers:
   - Default
   - TransparentFX

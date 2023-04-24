@@ -1,0 +1,16 @@
+{
+    "name": "ProceduralAnimation.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:db1983076cba28544a4279d3c16bc2c1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

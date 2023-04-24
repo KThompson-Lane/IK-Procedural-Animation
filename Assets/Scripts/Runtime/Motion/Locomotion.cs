@@ -10,7 +10,8 @@ namespace Motion
     {
         /// <value>target to follow</value>
         [SerializeField] private Transform target;
-        
+
+        public void SetTarget(Transform newTarget) => target = newTarget;
         /// <value>maximum allowed angle to the target in degrees before rotating to realign</value>
         [Header("Motion parameters")]
         [SerializeField] private float maxAngleToTarget;
@@ -98,7 +99,7 @@ namespace Motion
                 targetVelocity = moveSpeed * (targetDistance > approachDistance ? toTargetProjected :
                     targetDistance <= retreatDistance ? -toTargetProjected : Vector3.zero).normalized;
             }
-            
+
             //  Update our velocity using our second order system
             _currentVelocity = _movement.Update(Time.deltaTime, targetVelocity);
             //  Apply the velocity

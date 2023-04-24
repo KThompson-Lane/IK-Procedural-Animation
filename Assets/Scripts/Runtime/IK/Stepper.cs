@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,9 +9,12 @@ namespace IK
     /// </summary>
     public class Stepper : MonoBehaviour
     {
-        //  The home transform
-        [SerializeField] private Transform home;
+        public Transform root;
+        private Vector3 _footOffset; 
+        public LayerMask groundLayer;
 
+        private Vector3 _homeLocation;
+        
         //  Is this stepper weakened
         [SerializeField] private bool weakened;
         //  Whether it is currently taking a step
@@ -31,10 +35,24 @@ namespace IK
         /// </summary>
         public bool Grounded => !_moving;
 
-        /// <summary>
-        ///     Current distance to home position
-        /// </summary>
-        public float DistanceToHome => Vector3.Distance(transform.position, home.position);
+        private void Awake()
+        {
+            _footOffset = transform.position - root.position;
+            groundLayer = LayerMask.NameToLayer("Ground");
+        }
+
+        private void LateUpdate()
+        {
+            //  Update home position
+            //  Calculate home position relative to root transform
+            _homeLocation = root.position + (root.TransformDirection(_footOffset.normalized) * _footOffset.magnitude);
+            //  Raycast home position onto ground
+            if (Physics.Raycast(_homeLocation + Vector3.up * 10, Vector3.down, out var hit, 20, ~groundLayer))
+            {
+                _homeLocation = hit.point;
+            }
+
+        }
 
         /// <summary>
         ///     <para>Debug function for drawing each steppers current position and their home position</para>
@@ -44,7 +62,8 @@ namespace IK
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, 0.2f);
             Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(home.position, _stepDistance);
+
+            Gizmos.DrawWireSphere(_homeLocation, _stepDistance);
         }
 
         /// <summary>
@@ -54,9 +73,23 @@ namespace IK
         {
             //  Do nothing if we're already taking a step
             if (_moving) return;
+            
+            //  Check if we can take a step
 
-            if (Vector3.Distance(transform.position, home.position) > (!weakened? _stepDistance : _stepDistance/2))
-                StartCoroutine(TakeStep());
+            //  First check if we're outside of our home location
+            if (Vector3.Distance(transform.position, _homeLocation) > (!weakened ? _stepDistance : _stepDistance / 2))
+            {
+                var toTarget = _homeLocation - transform.position;
+                var overshotAmount = _stepDistance * _stepOvershoot;
+                var overshootVector = toTarget * overshotAmount;
+                overshootVector = Vector3.ProjectOnPlane(overshootVector, Vector3.up);
+                
+                //  Apply our overshoot vector to our home position to calculate our step target
+                var stepTarget = _homeLocation + overshootVector;
+                
+                StartCoroutine(TakeStep(transform.position, stepTarget));
+                
+            }
         }
 
         /// <summary>
@@ -76,35 +109,18 @@ namespace IK
         ///     <para>Coroutine for taking a step towards home taking stepDuration seconds</para>
         /// </summary>
         /// <returns> IEnumerator for the coroutine </returns>
-        private IEnumerator TakeStep()
+        private IEnumerator TakeStep(Vector3 initialPosition, Vector3 targetPosition)
         {
             //  Indicate a step has started
             _moving = true;
-
-            //  Keep track of initial transform
-            var initialPosition = transform.position;
-            var initialRotation = transform.rotation;
-
-            //  Keep track of our target transform
-            var targetPosition = home.position;
-            var targetRotation = home.rotation;
-
-            //  Directional vector to the home position
-            var toHome = targetPosition - initialPosition;
-
-            //  Calculate overshot amount and project it onto the XZ plane
-            var overshotAmount = _stepDistance * _stepOvershoot;
-            var overshootVector = toHome * overshotAmount;
-            overshootVector = Vector3.ProjectOnPlane(overshootVector, Vector3.up);
-
-            //  Apply our overshoot vector to our home position to calculate our step target
-            var stepTarget = targetPosition + overshootVector;
-
+            
+            
+            
             //  Calculate centre point
-            var stepCentre = (initialPosition + stepTarget) / 2;
+            var stepCentre = (transform.position + targetPosition) / 2;
 
             //  Raise centre point slightly to give the step some lift
-            stepCentre += home.up * Vector3.Distance(initialPosition, stepTarget) / 2f;
+            stepCentre += transform.up * Vector3.Distance(initialPosition, targetPosition) / 2f;
 
             // Time since step started
             var timeElapsed = 0f;
@@ -121,11 +137,9 @@ namespace IK
                 transform.position =
                     Vector3.Lerp(
                         Vector3.Lerp(initialPosition, stepCentre, T),
-                        Vector3.Lerp(stepCentre, stepTarget, T),
+                        Vector3.Lerp(stepCentre, targetPosition, T),
                         T
                     );
-
-                transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, T);
 
                 // Wait for one frame
                 yield return null;
