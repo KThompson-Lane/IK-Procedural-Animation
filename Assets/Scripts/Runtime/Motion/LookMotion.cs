@@ -11,7 +11,7 @@ namespace Motion
         [SerializeField] private Transform lookJoint;
         /// <value>target to track</value>
         [SerializeField] private Transform target;
-
+        public void SetTarget(Transform newTarget) => target = newTarget;
         /// <value>speed that it tracks the <c>target</c></value>
         [SerializeField] private float lookSpeed;
 

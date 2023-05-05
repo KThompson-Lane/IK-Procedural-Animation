@@ -46,6 +46,10 @@ namespace IK
         //  initial rotations for root and target
         private Quaternion _startRotationTarget, _startRotationRoot;
 
+        public void SetLength(int length) => chainLength = length;
+        public void SetTarget(Transform t) => target = t;
+        public void SetPole(Transform p) => pole = p;
+        
         /// <summary>
         ///     <para>Calls init on awake</para>
         /// </summary>
