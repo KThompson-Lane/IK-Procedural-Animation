@@ -77,7 +77,7 @@ namespace IK
             //  Check if we can take a step
 
             //  First check if we're outside of our home location
-            if (Vector3.Distance(transform.position, _homeLocation) > (!weakened ? _stepDistance : _stepDistance / 2))
+            if (Vector3.Distance(transform.position, _homeLocation) > (weakened ? _stepDistance * 1.8 : _stepDistance))
             {
                 var toTarget = _homeLocation - transform.position;
                 var overshotAmount = _stepDistance * _stepOvershoot;
