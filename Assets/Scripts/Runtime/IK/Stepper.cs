@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -16,13 +15,14 @@ namespace IK
         private Vector3 _homeLocation;
         
         //  Is this stepper weakened
-        [SerializeField] private bool weakened;
+        public bool Weakened { get; set; }
+        
         //  Whether it is currently taking a step
         private bool _moving;
 
         //  If we surpass this distance, step towards home
         private float _stepDistance;
-
+        
         //  Time it takes to complete a step 
         private float _stepDuration;
 
@@ -77,7 +77,7 @@ namespace IK
             //  Check if we can take a step
 
             //  First check if we're outside of our home location
-            if (Vector3.Distance(transform.position, _homeLocation) > (weakened ? _stepDistance * 1.8 : _stepDistance))
+            if (Vector3.Distance(transform.position, _homeLocation) > (Weakened ? _stepDistance * 1.8 : _stepDistance))
             {
                 var toTarget = _homeLocation - transform.position;
                 var overshotAmount = _stepDistance * _stepOvershoot;

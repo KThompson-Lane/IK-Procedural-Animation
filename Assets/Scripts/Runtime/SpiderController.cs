@@ -64,9 +64,9 @@ public class SpiderController : MonoBehaviour
     /// <remarks>We perform this in late update as it will ensure we have the most recent data</remarks>
     private void LateUpdate()
     {
-        if(_locomotion != null)
+        if (_locomotion != null)
             _locomotion.Move();
-        if(_headTracker != null)
+        if (_headTracker != null)
             _headTracker.UpdateLookMotion();
         //  Finally apply root motion
         UpdateRootMotion();
@@ -74,7 +74,7 @@ public class SpiderController : MonoBehaviour
 
     private void OnValidate()
     {
-        if(_rootMotion != null)
+        if (_rootMotion != null)
             _rootMotion.CalculateKValues(frequency, damping, initialResponse);
     }
 
@@ -158,7 +158,6 @@ public class SpiderController : MonoBehaviour
             var solver = foot.GetComponent<ChainSolver>() ?? foot.AddComponent<ChainSolver>();
             solver.SetLength(3);
             solver.SetTarget(legObj.transform);
-            legComponent.Solver = solver;
             var stepper = legObj.AddComponent<Stepper>();
             stepper.root = root.transform.parent;
             legComponent.Stepper = stepper;
