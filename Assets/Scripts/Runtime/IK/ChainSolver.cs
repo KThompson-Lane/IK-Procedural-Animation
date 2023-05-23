@@ -98,7 +98,7 @@ namespace IK
             _boneLengths = new float[chainLength];
             _startDirections = new Vector3[chainLength + 1];
             _startRotations = new Quaternion[chainLength + 1];
-
+            _positions = new Vector3[chainLength + 1];
             if (target is null)
             {
                 Debug.LogError("IK Target game object is null!");
@@ -151,7 +151,12 @@ namespace IK
                 Init();
 
             //Initialise positions array by mapping joint positions to array
-            _positions = _joints.Select(joint => joint.position).ToArray();
+            for (int i = 0; i < _joints.Length; i++)
+            {
+                _positions[i] = _joints[i].position;
+            }
+            
+            //_positions = _joints.Select(joint => joint.position).ToArray();
 
             //  First check if target position is further than total length of chain
             var rootToTarget = target.position - _positions[0];

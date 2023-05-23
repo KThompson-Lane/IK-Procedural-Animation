@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,20 @@ public class SpiderController : MonoBehaviour
             var stepDuration = leg.StepDistance / (_locomotion.MoveSpeed()* 200);
             leg.Stepper.ChangeLegParameters(leg.StepDistance, stepDuration, leg.overshootAmount);
         }
-        StartCoroutine(MoveLegs());
+
+        if (Legs.Length < 1)
+            throw new Exception("Error, no legs");
+
+
+        var legGroups = Legs.GroupBy(l => l.Group);
+        List<Leg>[] legs = new List<Leg>[legGroups.Count()];
+        
+        foreach (var group in legGroups)
+        {
+            legs[group.Key - 1] = group.ToList();
+        }
+        
+        StartCoroutine(MoveLegs(legs));
         _rootMotion = new SecondOrderVector(frequency, damping, initialResponse, rootBone.position);
         //  Calculate body height offset
         rootOffset = rootBone.position;
@@ -83,8 +97,16 @@ public class SpiderController : MonoBehaviour
         //  Determine root bone position relative to legs
         
         //  Calculate the average position of all legs
-        var averagePosition = Legs
-            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / Legs.Length;
+        Vector3 averagePosition = Vector3.zero;
+        foreach (var leg in Legs)
+        {
+            averagePosition += leg.transform.position;
+        }
+        averagePosition /= Legs.Length;
+        
+        
+        /*var averagePosition = Legs
+            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / Legs.Length;*/
         
         //  Raycast to account for terrain height
         if (Physics.Raycast(averagePosition + Vector3.up * 2, Vector3.down, out var hit, 5))
@@ -98,18 +120,28 @@ public class SpiderController : MonoBehaviour
     /// <summary>
     ///     <para>Try and move each group of legs</para>
     /// </summary>
-    private IEnumerator MoveLegs()
+    private IEnumerator MoveLegs(List<Leg>[] legs)
     {
-        while (Legs.Length > 0)
+        bool moving;
+        while (legs.Length > 0)
         {
-            foreach (var group in Legs.GroupBy(leg => leg.Group))
+            for (int i = 0; i < legs.Length; i++)
             {
+                var group = legs[i];
                 foreach (var leg in group)
                     leg.Stepper.TryStep();
+                moving = true;
                 do
                 {
                     yield return null;
-                } while (group.Any(leg => !leg.Stepper.Grounded));
+                    moving = false;
+                    foreach (var leg in group)
+                    {
+                        if (leg.Stepper.Grounded) continue;
+                        moving = true;
+                        break;
+                    }
+                } while (moving);
             }
         }
     }

@@ -8,10 +8,10 @@ namespace Editor
     {
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
             var myScript = (SpiderController) target;
             if(GUILayout.Button("Setup spider"))
                 myScript.InitialiseSpider();
+            DrawDefaultInspector();
         }
     }
 }
