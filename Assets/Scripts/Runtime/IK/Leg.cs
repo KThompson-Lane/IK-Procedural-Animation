@@ -7,9 +7,14 @@ namespace IK
     public class Leg : MonoBehaviour
     {
         public Stepper Stepper;
-        public ChainSolver Solver;
         public int Group;
         public float StepDistance;
         public float overshootAmount;
+        public bool Weakened;
+
+        private void OnValidate()
+        {
+            Stepper.Weakened = Weakened;
+        }
     }
 }
