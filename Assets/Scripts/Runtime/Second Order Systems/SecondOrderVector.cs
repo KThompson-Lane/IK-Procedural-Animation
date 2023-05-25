@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Second_Order_Systems
+namespace Runtime.Second_Order_Systems
 {
     public class SecondOrderVector : SecondOrderMotion<Vector3>
     {

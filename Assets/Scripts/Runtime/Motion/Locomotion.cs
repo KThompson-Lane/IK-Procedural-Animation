@@ -1,7 +1,7 @@
-﻿using Second_Order_Systems;
+﻿using Runtime.Second_Order_Systems;
 using UnityEngine;
 
-namespace Motion
+namespace Runtime.Motion
 {
     /// <summary>
     ///     <para>Applies locomotion to an object to move it towards a target</para>

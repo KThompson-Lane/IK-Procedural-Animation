@@ -1,8 +1,7 @@
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace IK
+namespace Runtime.IK
 {
     /// <summary>
     ///     <para>An IK chain solver which implements the FABRIK method</para>

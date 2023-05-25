@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace IK
+namespace Runtime.IK
 {
     /// <summary>
     ///     <para>A class which will attempt to take a step when it surpasses a set distance from it's home position</para>
@@ -131,7 +131,7 @@ namespace IK
 
                 //  Calculate time-step using the step duration and our total time elapsed
                 var T = timeElapsed / _stepDuration;
-                // Interpolate transform bi-linearly using nested Lerps
+                // Interpolate transform bi-linearly using nested lerps
                 transform.position =
                     Vector3.Lerp(
                         Vector3.Lerp(initialPosition, stepCentre, T),

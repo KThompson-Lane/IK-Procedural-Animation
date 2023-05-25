@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Motion
+namespace Runtime.Motion
 {
     /// <summary>
     ///     <para>Applies smoothing and interpolation to produce a pleasing look motion</para>

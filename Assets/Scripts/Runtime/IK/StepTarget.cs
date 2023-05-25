@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace IK
+namespace Runtime.IK
 {
     /// <summary>
     ///     <para>Projects the objects transform onto the <c>ground</c> layer</para>
