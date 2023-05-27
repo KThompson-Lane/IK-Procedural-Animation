@@ -155,8 +155,6 @@ namespace Runtime.IK
                 _positions[i] = _joints[i].position;
             }
             
-            //_positions = _joints.Select(joint => joint.position).ToArray();
-
             //  First check if target position is further than total length of chain
             var rootToTarget = target.position - _positions[0];
             //  Using the square magnitude is more performant

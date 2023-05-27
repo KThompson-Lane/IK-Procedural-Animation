@@ -105,11 +105,7 @@ namespace Runtime
                 averagePosition += leg.transform.position;
             }
             averagePosition /= Legs.Length;
-        
-        
-            /*var averagePosition = Legs
-            .Aggregate(Vector3.zero, (current, leg) => current + leg.transform.position) / Legs.Length;*/
-        
+
             //  Raycast to account for terrain height
             if (Physics.Raycast(averagePosition + Vector3.up * 2, Vector3.down, out var hit, 5))
             {
