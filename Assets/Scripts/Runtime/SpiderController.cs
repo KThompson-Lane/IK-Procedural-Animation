@@ -70,7 +70,7 @@ namespace Runtime
             StartCoroutine(MoveLegs(legs));
             _rootMotion = new SecondOrderVector(frequency, damping, initialResponse, rootBone.position);
             //  Calculate body height offset
-            rootOffset = rootBone.position;
+            rootOffset = new Vector3(0,rootBone.position.y);
         }
 
 
